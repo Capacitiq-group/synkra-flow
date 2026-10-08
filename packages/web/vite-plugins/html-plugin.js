@@ -12,7 +12,7 @@
       return {
         name: 'custom-html',
           transformIndexHtml(html) {
-            let newHtml = html.replace(/<%= apTitle %>/g, options.title || '');
+            let newHtml = html.replace(/<%= apTitle %>/g, options.title || 'Synkra Flow');
             
             newHtml = newHtml.replace(/<%= apFavicon %>/g, options.icon || '');
 
