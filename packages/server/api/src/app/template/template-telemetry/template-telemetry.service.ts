@@ -48,15 +48,9 @@ async function dispatch({ event, log }: DispatchParams): Promise<void> {
     return sendToInternal(event, log)
 }
 
-async function sendToCloud(event: TemplateTelemetryEvent): Promise<void> {
-    const url = `${CLOUD_TELEMETRY_URL}/event`
-    await tryCatch(() => fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(event),
-    }))
+async function sendToCloud(_event: TemplateTelemetryEvent): Promise<void> {
+    // Synkra: template telemetry is disabled — nothing leaves our servers.
+    return
 }
 
 async function sendToInternal(event: TemplateTelemetryEvent, log: FastifyBaseLogger): Promise<void> {

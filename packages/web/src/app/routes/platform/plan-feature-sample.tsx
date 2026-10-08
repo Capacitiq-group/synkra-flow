@@ -42,7 +42,7 @@ export function PlanFeatureGuard({
 
 const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
   sso: {
-    isLocked: (plan) => !plan.ssoEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'SSO',
       title: 'Enable Single Sign On',
@@ -52,7 +52,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   projectRoles: {
-    isLocked: (plan) => !plan.projectRolesEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'CUSTOM_ROLES',
       title: 'Enable Custom Roles',
@@ -62,7 +62,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   globalConnections: {
-    isLocked: (plan) => !plan.globalConnectionsEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'GLOBAL_CONNECTIONS',
       title: 'Enable Global Connections',
@@ -71,7 +71,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   templates: {
-    isLocked: (plan) => !plan.manageTemplatesEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'TEMPLATES',
       title: 'Unlock Templates',
@@ -81,7 +81,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   embedding: {
-    isLocked: (plan) => !plan.embeddingEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'SIGNING_KEYS',
       title: 'Unlock Embedding Through JS SDK',
@@ -90,7 +90,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   apiKeys: {
-    isLocked: (plan) => !plan.apiKeysEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'API',
       title: 'Enable API Keys',
@@ -99,7 +99,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   secretManagers: {
-    isLocked: (plan) => !plan.secretManagersEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'SECRET_MANAGERS',
       title: 'Enable Secret Managers',
@@ -108,7 +108,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   auditLogs: {
-    isLocked: (plan) => !plan.auditLogEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'AUDIT_LOGS',
       title: 'Unlock Audit Logs',
@@ -118,7 +118,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   eventStreaming: {
-    isLocked: (plan) => !plan.eventStreamingEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'EVENT_DESTINATIONS',
       title: 'Unlock Event Streaming',
@@ -130,7 +130,7 @@ const PLAN_FEATURE_SAMPLES: Record<PlanFeature, PlanFeatureSampleSpec> = {
     },
   },
   aiProviders: {
-    isLocked: (plan) => !plan.aiProvidersEnabled,
+    isLocked: () => false,
     teaser: {
       featureKey: 'UNIVERSAL_AI',
       title: 'Unlock AI Center',

@@ -16,6 +16,10 @@ export const LockedFeatureGuard = ({
   featureKey,
   showContactSales = true,
 }: LockedFeatureGuardProps) => {
+  // Synkra: gates demolished — always render children regardless of `locked`.
+  void locked;
+  return children;
+  // eslint-disable-next-line no-unreachable
   if (!locked) {
     return children;
   }

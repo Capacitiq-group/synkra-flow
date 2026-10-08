@@ -75,7 +75,7 @@ export function PlatformSidebar() {
             {
               to: '/platform/users/roles',
               label: t('Roles & Access'),
-              locked: !platform.plan.projectRolesEnabled,
+              locked: false,
               tier: PLATFORM_FEATURES.projectRoles.tier,
             },
           ],
@@ -89,7 +89,7 @@ export function PlatformSidebar() {
             {
               to: '/platform/connections/global',
               label: t('Global Connections'),
-              locked: !platform.plan.globalConnectionsEnabled,
+              locked: false,
               tier: PLATFORM_FEATURES.globalConnections.tier,
             },
           ],
@@ -108,7 +108,7 @@ export function PlatformSidebar() {
             {
               to: '/platform/pieces/piece-sets',
               label: t('Piece Sets'),
-              locked: !platform.plan.managePiecesEnabled,
+              locked: false,
               tier: PLATFORM_FEATURES.pieces.tier,
             },
           ],
@@ -117,14 +117,14 @@ export function PlatformSidebar() {
           to: '/platform/templates',
           label: t('Templates'),
           icon: LayoutGridIcon,
-          locked: !platform.plan.manageTemplatesEnabled,
+          locked: false,
           tier: PLATFORM_FEATURES.templates.tier,
         },
         {
           to: '/platform/ai',
           label: t('AI Center'),
           icon: SparklesIcon,
-          locked: !platform.plan.aiProvidersEnabled,
+          locked: false,
           tier: PLATFORM_FEATURES.aiProviders.tier,
           subItems:
             edition === ApEdition.COMMUNITY
@@ -146,14 +146,14 @@ export function PlatformSidebar() {
           to: '/platform/sso',
           label: t('Single Sign On'),
           icon: LogInIcon,
-          locked: !platform.plan.ssoEnabled,
+          locked: false,
           tier: PLATFORM_FEATURES.sso.tier,
         },
         {
           to: '/platform/secret-managers',
           label: t('Secret Managers'),
           icon: KeyRoundIcon,
-          locked: !platform.plan.secretManagersEnabled,
+          locked: false,
           tier: PLATFORM_FEATURES.secretManagers.tier,
         },
         {
@@ -165,13 +165,13 @@ export function PlatformSidebar() {
               to: '/platform/audit-log',
               label: t('Events'),
               end: true,
-              locked: !platform.plan.auditLogEnabled,
+              locked: false,
               tier: PLATFORM_FEATURES.auditLogs.tier,
             },
             {
               to: '/platform/audit-log/streaming',
               label: t('Event Streaming'),
-              locked: !platform.plan.eventStreamingEnabled,
+              locked: false,
               tier: PLATFORM_FEATURES.eventStreaming.tier,
             },
           ],
@@ -185,14 +185,14 @@ export function PlatformSidebar() {
           to: '/platform/api-keys',
           label: t('API Keys'),
           icon: FileJson2Icon,
-          locked: !platform.plan.apiKeysEnabled,
+          locked: false,
           tier: PLATFORM_FEATURES.apiKeys.tier,
         },
         {
           to: '/platform/embedding',
           label: t('Embedding'),
           icon: FrameIcon,
-          locked: !platform.plan.embeddingEnabled,
+          locked: false,
           tier: PLATFORM_FEATURES.embedding.tier,
         },
         {
@@ -222,7 +222,7 @@ export function PlatformSidebar() {
             {
               to: '/platform/workers/groups',
               label: t('Worker groups'),
-              locked: !platform.plan.workerGroupsEnabled,
+              locked: false,
             },
           ],
         },
@@ -265,13 +265,13 @@ export function PlatformSidebar() {
           to: '/platform/billing',
           label: t('Billing & subscription'),
           icon: ReceiptIcon,
-          locked: edition === ApEdition.COMMUNITY,
+          locked: false,
         },
         {
           to: '/platform/usage',
           label: t('Usage'),
           icon: ChartLineIcon,
-          locked: edition === ApEdition.COMMUNITY,
+          locked: false,
         },
         ...(edition === ApEdition.CLOUD
           ? []

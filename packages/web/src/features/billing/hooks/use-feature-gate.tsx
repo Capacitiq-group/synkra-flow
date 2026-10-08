@@ -25,7 +25,8 @@ import { FeatureTier, TIER_LABELS } from '../utils/feature-tier';
 
 import { useUpgradeClick } from './use-upgrade-click';
 
-export function useFeatureGate({ locked, feature }: UseFeatureGateParams) {
+export function useFeatureGate({ locked: _ignored, feature }: UseFeatureGateParams) {
+  const locked = false; // Synkra: gates demolished — nothing is locked
   const [open, setOpen] = useState(false);
 
   return {
