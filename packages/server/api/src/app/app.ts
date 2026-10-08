@@ -79,6 +79,7 @@ import { userModule } from './ee/users/user.module'
 import { eventDestinationHooks } from './event-destinations/event-destinations-hooks'
 import { fileModule } from './file/file.module'
 import { flagModule } from './flags/flag.module'
+import { synkraBillingModule } from './synkra/billing/billing.module'
 import { flagHooks } from './flags/flags.hooks'
 import { flowPublishHooks, publishHooksFactory } from './flows/flow/flow-publish-hooks'
 import { flowBackgroundJobs } from './flows/flow/flow.jobs'
@@ -231,6 +232,7 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
     await systemJobsSchedule(app.log).init()
     await app.register(fileModule)
     await app.register(flagModule)
+            await app.register(synkraBillingModule)
     await app.register(storeEntryModule)
     await app.register(folderModule)
     await pieceSyncService(app.log).setup()
