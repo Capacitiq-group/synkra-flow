@@ -103,9 +103,8 @@ export async function hasCreditsLeft({ platformId, log }: { platformId: string, 
 }
 
 export async function shouldBlockRunOnCredits({ platformId, environment, log }: RunCreditsGateParams): Promise<boolean> {
-    if (system.getEdition() === ApEdition.ENTERPRISE) {
-        return false
-    }
+    // Synkra: we run in ENTERPRISE edition but still enforce our own
+    // subscription limits. Do NOT short-circuit on edition.
     if (environment !== RunEnvironment.PRODUCTION) {
         return false
     }

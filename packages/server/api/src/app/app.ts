@@ -80,6 +80,7 @@ import { eventDestinationHooks } from './event-destinations/event-destinations-h
 import { fileModule } from './file/file.module'
 import { flagModule } from './flags/flag.module'
 import { synkraBillingModule } from './synkra/billing/billing.module'
+import { synkraBillingProvider } from './synkra/billing/synkra-billing-provider'
 import { flagHooks } from './flags/flags.hooks'
 import { flowPublishHooks, publishHooksFactory } from './flows/flow/flow-publish-hooks'
 import { flowBackgroundJobs } from './flows/flow/flow.jobs'
@@ -383,6 +384,9 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             flagHooks.set(enterpriseFlagsHooks)
             publishHooksFactory.set(eeFlowPublishHook)
             // billingProvider.set(autumnBillingProvider)  // Synkra: disabled — we manage plans locally, no remote overwrite
+            billingProvider.set(synkraBillingProvider)
+            billingProvider.set(synkraBillingProvider)
+            billingProvider.set(synkraBillingProvider)
             resumePageHooks.set((log) => ({ getTheme: (params) => appearanceHelper.getTheme({ ...params, log }) }))
             flowPublishHooks.set((log) => ({ assertReferencesResolve: assertAgentsResolveInProject, findMissingRequiredActions: (params) => pieceSetRequiredActions(log).findMissing(params) }))
             aiUsageHooks.set(agentConversationCreditsHooks)
@@ -424,6 +428,9 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             flagHooks.set(enterpriseFlagsHooks)
             publishHooksFactory.set(eeFlowPublishHook)
             // billingProvider.set(autumnBillingProvider)  // Synkra: disabled — we manage plans locally, no remote overwrite
+            billingProvider.set(synkraBillingProvider)
+            billingProvider.set(synkraBillingProvider)
+            billingProvider.set(synkraBillingProvider)
             resumePageHooks.set((log) => ({ getTheme: (params) => appearanceHelper.getTheme({ ...params, log }) }))
             flowPublishHooks.set((log) => ({ assertReferencesResolve: assertAgentsResolveInProject, findMissingRequiredActions: (params) => pieceSetRequiredActions(log).findMissing(params) }))
             aiUsageHooks.set(agentConversationCreditsHooks)
