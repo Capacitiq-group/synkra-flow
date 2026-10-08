@@ -1,10 +1,11 @@
 import { QueryRunner } from 'typeorm';
-import { Migration } from '../migration';
+import { Migration } from '../../migration';
 
-export class AddSynkraSubscription1791600000000 implements Migration {
-  name = 'AddSynkraSubscription1791600000000';
+export class AddSynkraSubscription1866000000000 implements Migration {
+  name = 'AddSynkraSubscription1866000000000';
   breaking = false;
-  timestamp = 1791600000000;
+  release = '0.93.0';
+  timestamp = 1866000000000;
 
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
