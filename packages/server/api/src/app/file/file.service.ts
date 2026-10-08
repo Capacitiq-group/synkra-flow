@@ -352,10 +352,9 @@ function groupProjectIdsByRetentionDays(projects: Pick<Project, 'id' | 'executio
 
 export function getLocationForFile(type: FileType) {
     const FILE_LOCATION = system.getOrThrow<FileLocation>(AppSystemProp.FILE_STORAGE_LOCATION)
-    if (type === FileType.FLOW_BUNDLE || type === FileType.PREWARM_SCOPE || isExecutionDataFileThatExpires(type)) {
-        return FILE_LOCATION
-    }
-    return FileLocation.DB
+    // Synkra: every file type goes to the configured location (S3).
+    // Nothing is stored locally or in Postgres.
+    return FILE_LOCATION
 }
 
 export function getDownloadName(file: Pick<File, 'id' | 'fileName' | 'type'>): string {
