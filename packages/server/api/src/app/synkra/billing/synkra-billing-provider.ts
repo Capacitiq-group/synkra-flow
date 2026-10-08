@@ -1,77 +1,107 @@
-import { ActivepiecesError, ErrorCode, PlatformUsageMetric } from '@activepieces/core-utils';
-import { FlowRunStatus, PlatformPlanWithOnlyLimits, ProjectType, RunEnvironment } from '@activepieces/shared';
-import { FastifyBaseLogger } from 'fastify';
-import { repoFactory } from '../../core/db/repo-factory';
-import { flowRunRepo } from '../../flows/flow-run/flow-run-service';
-import { projectService } from '../../project/project-service';
-import { BillingProvider, emptyBillingOverview } from '../../platform/billing-provider';
-import { system } from '../../helper/system/system';
-import { AppSystemProp } from '../../helper/system/system-props';
-import { getPlanLimits } from '@activepieces/shared';
-import { synkraSubscriptionService } from './subscription.service';
-import { Project } from '@activepieces/shared';
+import { FlowRunStatus, RunEnvironment } from '@activepieces/shared'
+import { FastifyBaseLogger } from 'fastify'
+import { flowRunRepo } from '../../flows/flow-run/flow-run-service'
+import { platformService } from '../../platform/platform.service'
+import { BillingProvider, emptyBillingOverview } from '../../platform/billing-provider'
+import { getPlanLimits } from '@activepieces/shared'
+import { synkraSubscriptionService } from './subscription.service'
 
 /**
- * Synkra billing provider — replaces the Autumn (or no-op) provider.
+ * Synkra billing provider.
  *
- * Enforcement:
- *   - Monthly execution cap (per user, reset by created month)
- *   - Active workflows cap (checked at flow-publish time elsewhere)
- *   - Seats, projects, storage — enforced separately in respective services
+ * Replaces the Autumn (or default no-op) provider. We sell Synkra
+ * subscriptions via Paystack, not AP credits. This provider gates
+ * production runs on the tier's monthly execution cap.
  *
- * We do NOT sell via Autumn. Paystack drives subscription state; this
- * provider just reads it and blocks over-limit runs.
+ * Wiring:
+ *   AP fires shouldBlockOnCredits before every production run
+ *   (webhook.service.ts and flow-run-service.ts). If we return true,
+ *   AP creates a QUOTA_EXCEEDED flow run and returns 402 to the caller.
+ *   The user sees the standard "quota exceeded" UI.
  */
 export const synkraBillingProvider = (log: FastifyBaseLogger): BillingProvider => ({
-  ...noopBillingProvider(log),
+  listPlans: async () => [],
+  getBillingOverview: async () => emptyBillingOverview({}),
+  createCheckoutSession: async () => ({ checkoutUrl: null }),
+  getBillingPortalUrl: async () => ({ url: '' }),
+  adjustUnconsumableFeatureQuantity: async () => ({ checkoutUrl: null }),
+  configureAutoTopUp: async () => {},
+  setupPayment: async () => ({ url: null }),
+  cancelSubscription: async () => {},
+  reactivateSubscription: async () => {},
+  trackFeature: async () => {},
+  ensureEnrolled: async () => {},
+  compFreeLegacy: async () => {},
+  refreshEntitlements: async () => {},
+  applyAppSumoPlan: async () => {},
+  activateLicense: async () => {},
+  isBillingEnforced: async () => true,
 
   async shouldBlockOnCredits(platformId: string): Promise<boolean> {
-    // Called before every production run. We check the plan owner's tier.
-    // The platform has one owner in our model — the platform's userId.
-    const ownerUserId = await getPlatformOwnerUserId(platformId);
+    const ownerUserId = await getPlatformOwnerUserId(platformId, log)
     if (!ownerUserId) {
-      // Not yet resolved — do not block. (Bootstrapping.)
-      return false;
+      // Bootstrap phase — no owner resolved yet. Do not block.
+      return false
     }
-    const sub = await synkraSubscriptionService(log).getOrCreateForUser(ownerUserId);
-    const plan = getPlanLimits(sub.tier);
+    const sub = await synkraSubscriptionService(log).getOrCreateForUser(ownerUserId)
+    const plan = getPlanLimits(sub.tier)
 
-    const used = await countRunsThisMonth(platformId);
+    if (plan.executions <= 0) {
+      // Tiers with no execution allowance are always blocked on production.
+      // (Free has 500, so this is only for future custom cases.)
+      log.warn(
+        { platformId, tier: sub.tier },
+        'synkra: tier has zero execution allowance — blocking run',
+      )
+      return true
+    }
+
+    const used = await countRunsThisMonth(platformId, log)
     if (used >= plan.executions) {
       log.warn(
         { platformId, tier: sub.tier, used, limit: plan.executions },
         'synkra: monthly execution cap reached',
-      );
-      return true;
+      )
+      return true
     }
-    return false;
+    return false
   },
-});
+
+  getCreditsAndAppSumoState: async () => ({
+    credits: { blocked: false, metered: false, usage: 0, limit: 0, remaining: 0, unlimited: true },
+    appSumo: { blocked: false, metered: false, usage: 0, limit: 0, remaining: 0, unlimited: true },
+  }),
+  getConsumablesUsage: async () => ({ credits: null, appSumo: null }),
+  getCreditUsage: async () => ({ total: 0, byProject: [] }),
+})
 
 /**
- * Returns the userId of the platform's owner. In our model, the platform
- * row has an ownerId — that's the account we bill against.
+ * Returns the userId of the platform's owner (the account we bill against).
  */
-async function getPlatformOwnerUserId(platformId: string): Promise<string | null> {
+async function getPlatformOwnerUserId(
+  platformId: string,
+  log: FastifyBaseLogger,
+): Promise<string | null> {
   try {
-    const { platformService } = await import('../../platform/platform.service');
-    const platform = await platformService(
-      // no logger available here; the service accepts undefined internally
-      undefined as unknown as FastifyBaseLogger,
-    ).getOne(platformId);
-    return platform?.ownerId ?? null;
-  } catch {
-    return null;
+    const platform = await platformService(log).getOne(platformId)
+    return platform?.ownerId ?? null
+  } catch (err) {
+    log.warn({ platformId, err }, 'synkra: could not resolve platform owner')
+    return null
   }
 }
 
 /**
- * Counts production flow runs (all non-test, all statuses except QUOTA_EXCEEDED)
- * for the current calendar month for a given platform.
+ * Counts production flow runs (all statuses except QUOTA_EXCEEDED) for the
+ * current calendar month, scoped to the platform via projects.
  */
-async function countRunsThisMonth(platformId: string): Promise<number> {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+async function countRunsThisMonth(
+  platformId: string,
+  log: FastifyBaseLogger,
+): Promise<number> {
+  const now = new Date()
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString()
+
   try {
     const count = await flowRunRepo()
       .createQueryBuilder('fr')
@@ -80,48 +110,10 @@ async function countRunsThisMonth(platformId: string): Promise<number> {
       .andWhere('fr.environment = :env', { env: RunEnvironment.PRODUCTION })
       .andWhere('fr.status != :quota', { quota: FlowRunStatus.QUOTA_EXCEEDED })
       .andWhere('fr.created >= :start', { start: monthStart })
-      .getCount();
-    return count;
+      .getCount()
+    return count
   } catch (err) {
-    log_warn(err);
-    return 0;
+    log.warn({ platformId, err }, 'synkra: countRunsThisMonth failed — allowing run')
+    return 0
   }
-}
-
-function log_warn(err: unknown): void {
-  // best-effort, keeps the check non-fatal on DB hiccups
-  // eslint-disable-next-line no-console
-  console.warn('[synkra billing] countRunsThisMonth failed:', err);
-}
-
-/**
- * The default no-op implementation. Most billing hooks we simply don't use —
- * we're not selling AP credits, we're selling Synkra subscriptions via Paystack.
- */
-function noopBillingProvider(_log: FastifyBaseLogger): BillingProvider {
-  return {
-    listPlans: async () => [],
-    getBillingOverview: async () => emptyBillingOverview({}),
-    createCheckoutSession: async () => ({ checkoutUrl: null }),
-    getBillingPortalUrl: async () => ({ url: '' }),
-    adjustUnconsumableFeatureQuantity: async () => ({ checkoutUrl: null }),
-    configureAutoTopUp: async () => {},
-    setupPayment: async () => ({ url: null }),
-    cancelSubscription: async () => {},
-    reactivateSubscription: async () => {},
-    trackFeature: async () => {},
-    ensureEnrolled: async () => {},
-    compFreeLegacy: async () => {},
-    refreshEntitlements: async () => {},
-    applyAppSumoPlan: async () => {},
-    activateLicense: async () => {},
-    isBillingEnforced: async () => true,
-    shouldBlockOnCredits: async () => false,
-    getCreditsAndAppSumoState: async () => ({
-      credits: { blocked: false, metered: false, usage: 0, limit: 0, remaining: 0, unlimited: true },
-      appSumo: { blocked: false, metered: false, usage: 0, limit: 0, remaining: 0, unlimited: true },
-    }),
-    getConsumablesUsage: async () => ({ credits: null, appSumo: null }),
-    getCreditUsage: async () => ({ total: 0, byProject: [] }),
-  };
 }

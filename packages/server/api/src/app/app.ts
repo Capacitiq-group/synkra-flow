@@ -385,8 +385,6 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             publishHooksFactory.set(eeFlowPublishHook)
             // billingProvider.set(autumnBillingProvider)  // Synkra: disabled — we manage plans locally, no remote overwrite
             billingProvider.set(synkraBillingProvider)
-            billingProvider.set(synkraBillingProvider)
-            billingProvider.set(synkraBillingProvider)
             resumePageHooks.set((log) => ({ getTheme: (params) => appearanceHelper.getTheme({ ...params, log }) }))
             flowPublishHooks.set((log) => ({ assertReferencesResolve: assertAgentsResolveInProject, findMissingRequiredActions: (params) => pieceSetRequiredActions(log).findMissing(params) }))
             aiUsageHooks.set(agentConversationCreditsHooks)
@@ -428,8 +426,6 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             flagHooks.set(enterpriseFlagsHooks)
             publishHooksFactory.set(eeFlowPublishHook)
             // billingProvider.set(autumnBillingProvider)  // Synkra: disabled — we manage plans locally, no remote overwrite
-            billingProvider.set(synkraBillingProvider)
-            billingProvider.set(synkraBillingProvider)
             billingProvider.set(synkraBillingProvider)
             resumePageHooks.set((log) => ({ getTheme: (params) => appearanceHelper.getTheme({ ...params, log }) }))
             flowPublishHooks.set((log) => ({ assertReferencesResolve: assertAgentsResolveInProject, findMissingRequiredActions: (params) => pieceSetRequiredActions(log).findMissing(params) }))
