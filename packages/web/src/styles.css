@@ -536,7 +536,7 @@
     --accent-6: var(--accent-light-6, oklch(85.25% 0.068 289.42));
     --accent-7: var(--accent-light-7, oklch(81.1% 0.0899 289.42));
     --accent-8: var(--accent-light-8, oklch(70.2% 0.1482 289.39));
-    --accent-9: var(--accent-light-9, #6e41e2);
+    --accent-9: var(--accent-light-9, #5DD62C);
     --accent-10: var(--accent-light-10, oklch(54.1% 0.2276 288.86));
     --accent-11: var(--accent-light-11, oklch(49.1% 0.2187 288.43));
     --accent-12: var(--accent-light-12, oklch(38% 0.1531 289.6));
@@ -697,7 +697,7 @@
     --accent-6: var(--accent-dark-6, oklch(31% 0.1353 288.61));
     --accent-7: var(--accent-dark-7, oklch(38% 0.141 288.61));
     --accent-8: var(--accent-dark-8, oklch(47% 0.175 288.43));
-    --accent-9: var(--accent-dark-9, #6e41e2);
+    --accent-9: var(--accent-dark-9, #5DD62C);
     --accent-10: var(--accent-dark-10, oklch(70.2% 0.1482 289.39));
     --accent-11: var(--accent-dark-11, oklch(81.1% 0.0899 289.42));
     --accent-12: var(--accent-dark-12, oklch(94.3% 0.0235 290.44));
@@ -1088,7 +1088,7 @@
 /* Animated AI gradient border */
 .auth-anim-gradient-border {
   position: relative;
-  background: linear-gradient(90deg, #8b5cf6, #a855f7, #c084fc, #a855f7, #8b5cf6);
+  background: linear-gradient(90deg, #5DD62C, #337418, #7EE55A, #337418, #5DD62C);
   background-size: 300% 100%;
   animation: auth-anim-gradient-flow 4s ease-in-out infinite;
   transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1116,7 +1116,7 @@
   inset: 0;
   border-radius: inherit;
   padding: 1.5px;
-  background: linear-gradient(90deg, #8142e3, #a855f7, #d946ef, #a855f7, #8142e3);
+  background: linear-gradient(90deg, #5DD62C, #337418, #7EE55A, #337418, #5DD62C);
   background-size: 300% 100%;
   animation: auth-anim-gradient-flow 4s ease-in-out infinite;
   -webkit-mask:
@@ -1221,23 +1221,23 @@
 }
 
 .recurring-chip {
-  color: #8142e3;
+  color: #5DD62C;
 }
 .recurring-chip:hover {
-  background-color: rgba(129, 66, 227, 0.08);
+  background-color: rgba(93, 214, 44, 0.08);
 }
 
 /* Endpoints repeat the same purple so the 200% tiled background loops seamlessly. */
 .recurring-chip-gradient {
   background-image: linear-gradient(
     90deg,
-    #8142e3,
-    #ec2d9c,
-    #f2742b,
-    #4f8fe8,
-    #f2742b,
-    #ec2d9c,
-    #8142e3
+    #5DD62C,
+    #337418,
+    #0F0F0F,
+    #7EE55A,
+    #0F0F0F,
+    #337418,
+    #5DD62C
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
