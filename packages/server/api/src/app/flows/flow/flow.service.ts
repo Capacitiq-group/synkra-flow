@@ -22,6 +22,7 @@ import { flowVersionRepo, flowVersionService } from '../flow-version/flow-versio
 import { flowFolderService } from '../folder/folder.service'
 import { flowExecutionCache } from './flow-execution-cache'
 import { flowPublishHooks, publishHooksFactory } from './flow-publish-hooks'
+import { synkraEnforcement } from '../../synkra/billing/enforcement'
 import { flowPublishUtils } from './flow-publish-utils'
 import { flowSideEffects } from './flow-service-side-effects'
 import { FlowEntity } from './flow.entity'
@@ -348,6 +349,8 @@ export const flowService = (log: FastifyBaseLogger) => ({
 
         switch (operation.type) {
             case FlowOperationType.LOCK_AND_PUBLISH: {
+                // Synkra: gate the publish on the tier's active-workflow cap.
+                await synkraEnforcement(log).checkActiveWorkflowLimit(projectId)
                 const flow = await this.getOneOrThrow({ id, projectId })
                 const flowVersionToPublish = await flowVersionService(log).getFlowVersionOrThrow({ flowId: id, versionId: undefined })
                 if (!skipRequiredActionsCheck) {

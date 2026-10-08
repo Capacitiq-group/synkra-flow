@@ -1,6 +1,7 @@
 import { ActivepiecesError, apId, Cursor, ErrorCode, isNil, Metadata, PlatformId, ProjectId, SeekPage, spreadIfDefined, tryCatch, UserId } from '@activepieces/core-utils'
 import { apDayjs } from '@activepieces/server-utils'
 import { AppConnectionScope, PiecesFilterType, PrincipalType, Project, ProjectType, ProjectWithLimits, UpdateProjectPlatformRequest } from '@activepieces/shared'
+import { synkraEnforcement } from '../../synkra/billing/enforcement'
 import { FastifyBaseLogger } from 'fastify'
 import { ArrayContains, Equal, ILike, In, IsNull } from 'typeorm'
 import { appConnectionsRepo } from '../../app-connection/app-connection-service/app-connection-service'
@@ -72,6 +73,8 @@ export const platformProjectService = (log: FastifyBaseLogger) => ({
         return paginationHelper.createPage<ProjectWithLimits>(projects, cursor)
     },
     async create(params: CreateProjectParams): Promise<ProjectWithLimits> {
+        // Synkra: gate project creation on the tier's workspace cap.
+        await synkraEnforcement(log).checkProjectLimit(params.platformId)
         const platformPlan = await platformPlanService(log).getOrCreateForPlatform(params.platformId)
         const platform = await platformService(log).getOneOrThrow(params.platformId)
         const project = await transaction(async (entityManager) => {
