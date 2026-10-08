@@ -141,6 +141,8 @@ const systemPropValidators: {
     [AppSystemProp.CONSOLE_API_SECRET_KEY]: stringValidator,
     // AppSystemProp
     [AppSystemProp.API_KEY]: stringValidator,
+    [AppSystemProp.SYNKRA_PAYSTACK_SECRET_KEY]: stringValidator,
+    [AppSystemProp.SYNKRA_PAYSTACK_WEBHOOK_SECRET]: stringValidator,
     [AppSystemProp.TEMPLATES_API_KEY]: stringValidator,
     [AppSystemProp.TEMPLATE_MANAGER_API_KEY]: stringValidator,
     [AppSystemProp.API_RATE_LIMIT_AUTHN_ENABLED]: booleanValidator,
