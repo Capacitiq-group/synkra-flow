@@ -59,7 +59,7 @@ import { pieceSetModule } from './ee/pieces/piece-set/piece-set.module'
 import { platformPieceModule } from './ee/pieces/platform-piece-module'
 import { adminPlatformModule } from './ee/platform/admin/admin-platform.controller'
 import { adminPlatformTemplatesCloudModule } from './ee/platform/admin/templates/admin-platform-templates-cloud.module'
-import { autumnBillingProvider } from './ee/platform/platform-plan/billing-providers/autumn-billing'
+// Synkra: removed import of autumnBillingProvider from './ee/platform/platform-plan/billing-providers/autumn-billing'
 import { platformPlanModule } from './ee/platform/platform-plan/platform-plan.module'
 import { platformTeardownJobs } from './ee/platform/platform-teardown-jobs'
 import { eventDestinationEntitlementHooks } from './ee/platform-webhooks/event-destination-entitlement-hooks'
@@ -380,7 +380,7 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             projectHooks.set(projectEnterpriseHooks)
             flagHooks.set(enterpriseFlagsHooks)
             publishHooksFactory.set(eeFlowPublishHook)
-            billingProvider.set(autumnBillingProvider)
+            // billingProvider.set(autumnBillingProvider)  // Synkra: disabled — we manage plans locally, no remote overwrite
             resumePageHooks.set((log) => ({ getTheme: (params) => appearanceHelper.getTheme({ ...params, log }) }))
             flowPublishHooks.set((log) => ({ assertReferencesResolve: assertAgentsResolveInProject, findMissingRequiredActions: (params) => pieceSetRequiredActions(log).findMissing(params) }))
             aiUsageHooks.set(agentConversationCreditsHooks)
@@ -421,7 +421,7 @@ export const setupApp = async (app: FastifyInstance): Promise<FastifyInstance> =
             projectHooks.set(projectEnterpriseHooks)
             flagHooks.set(enterpriseFlagsHooks)
             publishHooksFactory.set(eeFlowPublishHook)
-            billingProvider.set(autumnBillingProvider)
+            // billingProvider.set(autumnBillingProvider)  // Synkra: disabled — we manage plans locally, no remote overwrite
             resumePageHooks.set((log) => ({ getTheme: (params) => appearanceHelper.getTheme({ ...params, log }) }))
             flowPublishHooks.set((log) => ({ assertReferencesResolve: assertAgentsResolveInProject, findMissingRequiredActions: (params) => pieceSetRequiredActions(log).findMissing(params) }))
             aiUsageHooks.set(agentConversationCreditsHooks)
