@@ -2,7 +2,7 @@ import { Permission } from '@activepieces/core-utils';
 import { lazyWithRetry } from '@/lib/lazy-with-retry';
 import { UncategorizedFolderId } from '@activepieces/shared';
 import { t } from 'i18next';
-import { useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 import {
   useLocation,
   useNavigate,

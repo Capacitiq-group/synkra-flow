@@ -1,6 +1,7 @@
-import { Permission } from '@activepieces/core-utils';
+import { isNil, Permission, tryCatch } from '@activepieces/core-utils';
 import { ApFlagId, PlatformRole, ProjectType } from '@activepieces/shared';
 import { t } from 'i18next';
+import { toast } from 'sonner';
 import { Bell, GitBranch, Puzzle, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,6 +10,7 @@ import { AlertsSettings } from '@/app/components/project-settings/alerts';
 import { EnvironmentSettings } from '@/app/components/project-settings/environment';
 import { MembersSettings } from '@/app/components/project-settings/members';
 import { PiecesSettings } from '@/app/components/project-settings/pieces';
+import { projectSettingsFormDefaults } from '@/app/components/project-settings/form-defaults';
 import { projectCollectionUtils } from '@/features/projects';
 import { useAuthorization } from '@/hooks/authorization-hooks';
 import { flagsHooks } from '@/hooks/flags-hooks';
@@ -16,8 +18,12 @@ import { platformHooks } from '@/hooks/platform-hooks';
 import { userHooks } from '@/hooks/user-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
+import { INTERNAL_ERROR_MESSAGE } from '@/components/ui/sonner';
+import { ProjectAvatar } from '@/app/components/project-avatar';
+import { FormValues } from '@/app/components/project-settings/general';
 
-type TabId = 'members' | 'alerts' | 'pieces' | 'environment';
+type TabId = 'general' | 'members' | 'alerts' | 'pieces' | 'environment';
 
 const TABS: {
   id: TabId;

@@ -1,11 +1,11 @@
 #!/bin/bash
-# Fail-fast type check for both packages. Use before EVERY deploy.
+# Real type check. Uses tsconfig.app.json (the one that actually includes files).
 set -e
 
 cd /root/synkra-flow/packages/web
 echo "══════════ WEB ══════════"
 set -o pipefail
-npx tsc -p tsconfig.json --noEmit
+npx tsc -p tsconfig.app.json --noEmit
 echo "✓ web OK"
 
 cd /root/synkra-flow/packages/server/api

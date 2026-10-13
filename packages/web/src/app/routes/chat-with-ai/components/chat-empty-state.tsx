@@ -12,6 +12,7 @@ import {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { synkraBillingHooks } from '@/features/synkra-billing';
 
 import { LogoPlate } from '@/components/custom/logo-plate';
 import { Button } from '@/components/ui/button';
@@ -94,26 +95,43 @@ function CollapseOnInput({
 
 export function SetupRequiredState() {
   const navigate = useNavigate();
-
+  const { data: sub } = synkraBillingHooks.useSubscription();
+  const isFreeTier = (sub?.tier ?? 'free') === 'free';
+  if (isFreeTier) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-20 flex-1 min-w-0">
+        <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-gray-3">
+          <Settings className="h-8 w-8 text-gray-11" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold">
+            {t('AI Chat is available on paid plans')}
+          </h2>
+          <p className="text-gray-11 text-sm max-w-md">
+            {t(
+              'Upgrade to Starter or higher to unlock AI Chat with your connected apps.',
+            )}
+          </p>
+        </div>
+        <Button onClick={() => navigate('/billing')} className="gap-2">
+          {t('Upgrade plan')}
+        </Button>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-20 flex-1 min-w-0">
       <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-gray-3">
         <Settings className="h-8 w-8 text-gray-11" />
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold">
-          {t('Set up an AI provider to get started')}
-        </h2>
+        <h2 className="text-xl font-semibold">{t('AI is not yet configured')}</h2>
         <p className="text-gray-11 text-sm max-w-md">
           {t(
-            'AI Chat requires an AI provider. Add your provider in the AI settings to start chatting.',
+            'Your workspace owner needs to connect an AI provider before AI Chat can be used.',
           )}
         </p>
       </div>
-      <Button onClick={() => navigate('/platform/ai')} className="gap-2">
-        <Settings className="h-4 w-4" />
-        {t('Go to AI Settings')}
-      </Button>
     </div>
   );
 }
