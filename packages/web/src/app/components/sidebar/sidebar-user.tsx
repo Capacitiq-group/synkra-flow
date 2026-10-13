@@ -1,8 +1,9 @@
 import { isNil } from '@activepieces/core-utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { t } from 'i18next';
-import { ChevronsUpDown, LogOut, UserCogIcon } from 'lucide-react';
+import { Building2, ChevronsUpDown, LogOut, Moon, Sun, UserCogIcon } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { UserAvatar } from '@/components/custom/user-avatar';
 import { useEmbedding } from '@/components/providers/embed-provider';
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/sidebar-shadcn';
 import { userHooks } from '@/hooks/user-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
+import { useTheme } from '@/components/providers/theme-provider';
 import { cn } from '@/lib/utils';
 
 import { AccountSettingsDialog } from '../account-settings';
@@ -30,10 +32,12 @@ import { HelpAndFeedback } from '../help-and-feedback';
 
 export function SidebarUser() {
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
+  const navigate = useNavigate();
   const { embedState } = useEmbedding();
   const { data: user } = userHooks.useCurrentUser();
   const queryClient = useQueryClient();
   const { state } = useSidebar();
+  const { resolvedTheme, setPreference } = useTheme();
   const isCollapsed = state === 'collapsed';
   if (!user || embedState.isEmbedded) {
     return null;
@@ -107,7 +111,26 @@ export function SidebarUser() {
                 {t('Account Settings')}
               </DropdownMenuItem>
 
+              <DropdownMenuItem
+                onClick={() => navigate('/agency')}
+              >
+                <Building2 className="w-4 h-4 mr-2" />
+                {t('Agency Programme')}
+              </DropdownMenuItem>
               <HelpAndFeedback />
+              <DropdownMenuItem
+                onClick={() =>
+                  setPreference(resolvedTheme === 'dark' ? 'light' : 'dark')
+                }
+                className="cursor-pointer"
+              >
+                {resolvedTheme === 'dark' ? (
+                  <Sun className="w-4 h-4 mr-2" />
+                ) : (
+                  <Moon className="w-4 h-4 mr-2" />
+                )}
+                {resolvedTheme === 'dark' ? t('Light mode') : t('Dark mode')}
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

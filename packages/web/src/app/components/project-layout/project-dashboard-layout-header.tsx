@@ -1,5 +1,6 @@
 import { isNil, Permission } from '@activepieces/core-utils';
 import { t } from 'i18next';
+import { CreditCard } from 'lucide-react';
 import { useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -11,6 +12,7 @@ import { VariableIcon } from '@/components/icons/variable';
 import { WorkflowIcon } from '@/components/icons/workflow';
 import { useEmbedding } from '@/components/providers/embed-provider';
 import { Separator } from '@/components/ui/separator';
+import { SynkraInfoTip } from '@/components/custom/synkra-info-tip';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { flowApprovalsHooks } from '@/features/flow-approvals';
 import { projectCollectionUtils } from '@/features/projects';
@@ -27,12 +29,14 @@ type AnimatedIconHandle = {
   stopAnimation: () => void;
 };
 
+type AnimatedTabExtras = { infoTerm?: string };
+
 const AnimatedTab = ({
   tab,
   isActive,
   onClick,
 }: {
-  tab: ProjectDashboardLayoutHeaderTab;
+  tab: ProjectDashboardLayoutHeaderTab & AnimatedTabExtras;
   isActive: boolean;
   onClick: () => void;
 }) => {
@@ -56,6 +60,11 @@ const AnimatedTab = ({
     >
       <IconComponent ref={iconRef} size={16} className="mr-2" />
       {tab.label}
+      {tab.infoTerm && (
+        <span className="ml-1" onClick={(e) => e.stopPropagation()}>
+          <SynkraInfoTip term={tab.infoTerm} />
+        </span>
+      )}
       {tab.beta && (
         <span className="ml-1.5 rounded-full bg-accent-3 px-1.5 py-0.5 text-[10px] font-medium leading-none text-accent-11">
           Beta
@@ -95,15 +104,17 @@ export const ProjectDashboardLayoutHeader = () => {
   const secondaryTabs: ProjectDashboardLayoutHeaderTab[] = [
     {
       to: authenticationSession.appendProjectRoutePrefix('/runs'),
-      label: t('Runs'),
+      label: t('History'),
       icon: HistoryIcon,
+      infoTerm: 'history',
       hasPermission: checkAccess(Permission.READ_RUN),
       show: true,
     },
     {
-      to: authenticationSession.appendProjectRoutePrefix('/connections'),
-      label: t('Connections'),
+      to: authenticationSession.appendProjectRoutePrefix('/integrations'),
+      label: t('Integrations'),
       icon: ConnectIcon,
+      infoTerm: 'integration',
       hasPermission: checkAccess(Permission.READ_APP_CONNECTION),
       show: true,
     },
@@ -111,28 +122,16 @@ export const ProjectDashboardLayoutHeader = () => {
       to: authenticationSession.appendProjectRoutePrefix('/variables'),
       label: t('Variables'),
       icon: VariableIcon,
+      infoTerm: 'variable',
       hasPermission: checkAccess(Permission.READ_VARIABLE),
       show: true,
     },
     {
-      to: authenticationSession.appendProjectRoutePrefix('/releases'),
-      icon: BoxIcon,
-      label: t('Releases'),
-      hasPermission:
-        project.releasesEnabled &&
-        checkAccess(Permission.READ_PROJECT_RELEASE) &&
-        !isEmbedded,
-      show: project.releasesEnabled,
-    },
-    {
-      to: authenticationSession.appendProjectRoutePrefix('/approvals'),
-      icon: ShieldIcon,
-      label: t('Pending approvals'),
-      hasPermission:
-        !isFetchingProjectRole &&
-        checkAccess(Permission.PUBLISH_SENSITIVE_FLOW_ACCESS),
-      show: !!platform.plan.environmentsEnabled && !!project.sensitive,
-      badgeCount: pendingCount,
+      to: authenticationSession.appendProjectRoutePrefix('/billing'),
+      label: t('Billing'),
+      icon: CreditCard,
+      hasPermission: true,
+      show: true,
     },
   ];
 

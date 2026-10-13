@@ -94,31 +94,29 @@ export function PlatformSidebar() {
             },
           ],
         },
+        {
+          to: '/platform/preflight',
+          label: t('Preflight'),
+          icon: FileHeartIcon,
+        },
       ],
     },
     {
       label: t('Catalogue'),
       items: [
         {
-          to: '/platform/pieces',
+          to: '/platform/integrations',
           label: t('Pieces'),
           icon: PuzzleIcon,
           subItems: [
-            { to: '/platform/pieces', label: t('Pieces'), end: true },
+            { to: '/platform/integrations', label: t('Pieces'), end: true },
             {
-              to: '/platform/pieces/piece-sets',
-              label: t('Piece Sets'),
+              to: '/platform/integrations/integration-sets',
+              label: t('Integration Sets'),
               locked: false,
               tier: PLATFORM_FEATURES.pieces.tier,
             },
           ],
-        },
-        {
-          to: '/platform/templates',
-          label: t('Templates'),
-          icon: LayoutGridIcon,
-          locked: false,
-          tier: PLATFORM_FEATURES.templates.tier,
         },
         {
           to: '/platform/ai',

@@ -96,6 +96,7 @@ const PlatformTemplatesPage = React.lazy(() =>
   })),
 );
 const UsersPage = React.lazy(() => import('./platform/users'));
+const PreflightPage = React.lazy(() => import('./platform/preflight'));
 const PlatformConnectionsPage = React.lazy(
   () => import('./platform/connections'),
 );
@@ -213,12 +214,12 @@ export const platformRoutes = [
     ),
   },
   {
-    path: '/platform/pieces',
+    path: '/platform/integrations',
     element: (
       <PlatformLayout>
-        <PageTitle title="Pieces">
+        <PageTitle title="Integrations">
           <LegacyTabRedirect
-            basePath="/platform/pieces"
+            basePath="/platform/integrations"
             tabPaths={PIECES_TAB_PATHS}
           >
             <SuspenseWrapper>
@@ -230,12 +231,12 @@ export const platformRoutes = [
     ),
   },
   {
-    path: '/platform/pieces/piece-sets',
+    path: '/platform/integrations/integration-sets',
     element: (
       <PlatformLayout>
-        <PageTitle title="Piece Sets">
+        <PageTitle title="Integration Sets">
           <LegacyTabRedirect
-            basePath="/platform/pieces"
+            basePath="/platform/integrations"
             tabPaths={PIECES_TAB_PATHS}
           >
             <SuspenseWrapper>
@@ -247,10 +248,10 @@ export const platformRoutes = [
     ),
   },
   {
-    path: '/platform/pieces/piece-sets/:id',
+    path: '/platform/integrations/integration-sets/:id',
     element: (
       <PlatformLayout>
-        <PageTitle title="Piece Set">
+        <PageTitle title="Integration Set">
           <SuspenseWrapper>
             <PieceSetDetailsPage />
           </SuspenseWrapper>
@@ -299,16 +300,20 @@ export const platformRoutes = [
     ),
   },
   {
-    path: '/platform/billing',
+    path: '/platform/preflight',
     element: (
       <PlatformLayout>
-        <PageTitle title="Billing">
+        <PageTitle title="Preflight">
           <SuspenseWrapper>
-            <SettingsBilling />
+            <PreflightPage />
           </SuspenseWrapper>
         </PageTitle>
       </PlatformLayout>
     ),
+  },
+  {
+    path: '/platform/billing',
+    element: <Navigate to="/billing" replace />,
   },
   {
     path: '/platform/usage',
@@ -324,23 +329,11 @@ export const platformRoutes = [
   },
   {
     path: '/platform/billing/success',
-    element: (
-      <PlatformLayout>
-        <PageTitle title="Billing">
-          <Success />
-        </PageTitle>
-      </PlatformLayout>
-    ),
+    element: <Navigate to="/billing" replace />,
   },
   {
     path: '/platform/billing/error',
-    element: (
-      <PlatformLayout>
-        <PageTitle title="Billing">
-          <Error />
-        </PageTitle>
-      </PlatformLayout>
-    ),
+    element: <Navigate to="/billing" replace />,
   },
   {
     path: '/platform/api-keys',

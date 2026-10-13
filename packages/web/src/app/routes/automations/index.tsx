@@ -1,4 +1,5 @@
 import { Permission } from '@activepieces/core-utils';
+import { lazyWithRetry } from '@/lib/lazy-with-retry';
 import { UncategorizedFolderId } from '@activepieces/shared';
 import { t } from 'i18next';
 import { useCallback } from 'react';
@@ -42,6 +43,11 @@ import { projectCollectionUtils, getProjectName } from '@/features/projects';
 import { ImportTableDialog } from '@/features/tables/components/import-table-dialog';
 import { useAuthorization } from '@/hooks/authorization-hooks';
 import { authenticationSession } from '@/lib/authentication-session';
+
+const GetStartedChecklist = lazyWithRetry(
+  () => import('@/features/synkra-onboarding/components/get-started-checklist').then((m) => ({ default: m.GetStartedChecklist })),
+  'get-started-checklist',
+);
 
 export const AutomationsPage = () => {
   const { projectId: projectIdFromUrl } = useParams<{ projectId: string }>();
@@ -319,13 +325,18 @@ const AutomationsPageContent = ({ projectId }: { projectId: string }) => {
 
   if (isEmptyState) {
     return (
-      <AutomationsEmptyState
-        onRefresh={() => invalidateAll()}
-        agentsVisible={agentsVisible}
-        userHasPermissionToWriteAgent={userHasPermissionToWriteAgent}
-        isCreatingAgent={mutations.isCreatingAgent}
-        onCreateAgent={() => mutations.createAgent()}
-      />
+      <div className="mx-auto w-full max-w-4xl p-6 flex flex-col gap-6">
+        <Suspense fallback={null}>
+          <GetStartedChecklist />
+        </Suspense>
+        <AutomationsEmptyState
+          onRefresh={() => invalidateAll()}
+          agentsVisible={agentsVisible}
+          userHasPermissionToWriteAgent={userHasPermissionToWriteAgent}
+          isCreatingAgent={mutations.isCreatingAgent}
+          onCreateAgent={() => mutations.createAgent()}
+        />
+      </div>
     );
   }
 

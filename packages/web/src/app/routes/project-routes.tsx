@@ -13,6 +13,7 @@ import { BuilderLayout } from '../components/builder-layout';
 import { ProjectDashboardLayout } from '../components/project-layout';
 import { AfterImportFlowRedirect } from '../guards/after-import-flow-redirect';
 import { AgentsFlagGuard } from '../guards/agents-flag-guard';
+import { SynkraHiddenV1Guard } from '../guards/synkra-hidden-v1-guard';
 import { RoutePermissionGuard } from '../guards/permission-guard';
 import { ProjectRouterWrapper } from '../guards/project-route-wrapper';
 
@@ -24,6 +25,18 @@ import { McpReachGuard } from './mcp-server/mcp-reach-guard';
 const AgentEditorPage = lazyWithRetry(
   () => import('./agents/id').then((m) => ({ default: m.AgentEditorPage })),
   'agent-editor',
+);
+const AgencyPage = lazyWithRetry(
+  () => import('./agency').then((m) => ({ default: m.AgencyPage })),
+  'agency',
+);
+const DashboardPage = lazyWithRetry(
+  () => import('./dashboard').then((m) => ({ default: m.DashboardPage })),
+  'dashboard',
+);
+const OnboardingPage = lazyWithRetry(
+  () => import('./onboarding').then((m) => ({ default: m.OnboardingPage })),
+  'onboarding',
 );
 const FlowBuilderPage = lazyWithRetry(
   () => import('./flows/id').then((m) => ({ default: m.FlowBuilderPage })),
@@ -42,6 +55,14 @@ const ViewRelease = lazyWithRetry(
   () => import('./project-release/view-release'),
   'view-release',
 );
+const BillingManagePage = lazyWithRetry(
+  () => import('./billing').then((m) => ({ default: m.BillingManagePage })),
+  'billing-manage',
+);
+const BillingCheckoutPage = lazyWithRetry(
+  () => import('./billing/checkout').then((m) => ({ default: m.BillingCheckoutPage })),
+  'billing-checkout',
+);
 const RunsPage = lazyWithRetry(
   () => import('./runs').then((m) => ({ default: m.RunsPage })),
   'runs',
@@ -54,6 +75,10 @@ const AppConnectionsPage = lazyWithRetry(
   () =>
     import('./connections').then((m) => ({ default: m.AppConnectionsPage })),
   'connections',
+);
+const SettingsPage = lazyWithRetry(
+  () => import('./settings').then((m) => ({ default: m.SettingsPage })),
+  'settings-page',
 );
 const VariablesPage = lazyWithRetry(
   () => import('./variables').then((m) => ({ default: m.VariablesPage })),
@@ -107,6 +132,69 @@ const agentEditorElement = (
 );
 
 export const projectRoutes = [
+  {
+    path: '/dashboard',
+    element: (
+      <ProjectDashboardLayout>
+        <Suspense fallback={<RouteLoadingBar />}>
+          <DashboardPage />
+        </Suspense>
+      </ProjectDashboardLayout>
+    ),
+  },
+
+  {
+    path: '/agency',
+    element: (
+      <Suspense fallback={<RouteLoadingBar />}>
+        <AgencyPage />
+      </Suspense>
+    ),
+  },
+  // Onboarding wizard — no project context required.
+  {
+    path: '/onboarding',
+    element: (
+      <Suspense fallback={<RouteLoadingBar />}>
+        <OnboardingPage />
+      </Suspense>
+    ),
+  },
+
+  // Old URL redirect: /connections -> /integrations (backward compat)
+  {
+    path: '/connections',
+    element: <Navigate to="/integrations" replace />,
+  },
+  {
+    path: '/connections/:connectionId',
+    element: <Navigate to="/integrations" replace />,
+  },
+
+  ...ProjectRouterWrapper({
+    path: '/billing',
+    element: (
+      <ProjectDashboardLayout>
+        <PageTitle title="Billing">
+          <SuspenseWrapper>
+            <BillingManagePage />
+          </SuspenseWrapper>
+        </PageTitle>
+      </ProjectDashboardLayout>
+    ),
+  }),
+  ...ProjectRouterWrapper({
+    path: '/billing/checkout',
+    element: (
+      <ProjectDashboardLayout>
+        <PageTitle title="Checkout">
+          <SuspenseWrapper>
+            <BillingCheckoutPage />
+          </SuspenseWrapper>
+        </PageTitle>
+      </ProjectDashboardLayout>
+    ),
+  }),
   ...ProjectRouterWrapper({
     path: routesThatRequireProjectId.singleAgent,
     element: agentEditorElement,
@@ -270,10 +358,12 @@ export const projectRoutes = [
     ),
   }),
   ...ProjectRouterWrapper({
-    path: routesThatRequireProjectId.settings,
+    path: `${routesThatRequireProjectId.settings}/:section?/:sub?`,
     element: (
       <ProjectDashboardLayout>
-        <SettingsRerouter></SettingsRerouter>
+        <SuspenseWrapper>
+          <SettingsPage />
+        </SuspenseWrapper>
       </ProjectDashboardLayout>
     ),
   }),
@@ -300,7 +390,7 @@ export const projectRoutes = [
         <McpReachGuard>
           <PageTitle title="MCP Server">
             <SuspenseWrapper>
-              <McpServerPage />
+              <SynkraHiddenV1Guard><McpServerPage /></SynkraHiddenV1Guard>
             </SuspenseWrapper>
           </PageTitle>
         </McpReachGuard>
