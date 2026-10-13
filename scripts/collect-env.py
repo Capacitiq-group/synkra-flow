@@ -10,18 +10,18 @@ ENV_FILE = Path("/root/synkra-flow/.env")
 
 VARS = [
     # (env_key, prompt label, is_secret, description)
-    ("SYNKRA_PAYSTACK_SECRET_KEY",      "Paystack Secret Key",      True,  "sk_live_xxx or sk_test_xxx"),
-    ("SYNKRA_PAYSTACK_PUBLIC_KEY",      "Paystack Public Key",      False, "pk_live_xxx or pk_test_xxx"),
-    ("SYNKRA_PAYSTACK_WEBHOOK_SECRET",  "Paystack Webhook Secret",  True,  "whsec_xxx"),
-    ("SYNKRA_PAYSTACK_PLAN_STARTER",    "Paystack Starter Plan Code",    False, "PLN_15wpi28chj8eg2e"),
-    ("SYNKRA_PAYSTACK_PLAN_BUSINESS",   "Paystack Business Plan Code",   False, "PLN_rkob6fqorz4mdxw"),
-    ("SYNKRA_PAYSTACK_PLAN_PRO",        "Paystack Pro Plan Code",        False, "PLN_u2eholu8jg435he"),
-    ("RESEND_API_KEY",                  "Resend API Key",           True,  "re_xxx"),
-    ("RESEND_FROM_EMAIL",               "Resend From Email",        False, "noreply@synkra.co.za"),
-    ("RESEND_FROM_NAME",                "Resend From Name",         False, "Synkra Flow"),
-    ("SYNKRA_AI_API_KEY",               "Synkra AI API Key (DeepSeek)", True,  "sk-xxx"),
-    ("SYNKRA_AI_BASE_URL",              "Synkra AI Base URL",       False, "https://api.deepseek.com/v1"),
-    ("SYNKRA_AI_MODEL",                 "Synkra AI Model",          False, "deepseek-chat"),
+    ("AP_SYNKRA_PAYSTACK_SECRET_KEY",      "Paystack Secret Key",      True,  "sk_live_xxx or sk_test_xxx"),
+    ("AP_SYNKRA_PAYSTACK_PUBLIC_KEY",      "Paystack Public Key",      False, "pk_live_xxx or pk_test_xxx"),
+    ("AP_SYNKRA_PAYSTACK_WEBHOOK_SECRET",  "Paystack Webhook Secret",  True,  "whsec_xxx"),
+    ("AP_SYNKRA_PAYSTACK_PLAN_STARTER",    "Paystack Starter Plan Code",    False, "PLN_15wpi28chj8eg2e"),
+    ("AP_SYNKRA_PAYSTACK_PLAN_BUSINESS",   "Paystack Business Plan Code",   False, "PLN_rkob6fqorz4mdxw"),
+    ("AP_SYNKRA_PAYSTACK_PLAN_PRO",        "Paystack Pro Plan Code",        False, "PLN_u2eholu8jg435he"),
+    ("AP_RESEND_API_KEY",                  "Resend API Key",           True,  "re_xxx"),
+    ("AP_RESEND_FROM_EMAIL",               "Resend From Email",        False, "noreply@synkra.co.za"),
+    ("AP_RESEND_FROM_NAME",                "Resend From Name",         False, "Synkra Flow"),
+    ("AP_SYNKRA_AI_API_KEY",               "Synkra AI API Key (DeepSeek)", True,  "sk-xxx"),
+    ("AP_SYNKRA_AI_BASE_URL",              "Synkra AI Base URL",       False, "https://api.deepseek.com/v1"),
+    ("AP_SYNKRA_AI_MODEL",                 "Synkra AI Model",          False, "deepseek-chat"),
 ]
 
 def read_existing(key):

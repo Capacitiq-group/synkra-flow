@@ -3,6 +3,7 @@ import { ApFlagId, PlatformRole, ProjectType } from '@activepieces/shared';
 import { t } from 'i18next';
 import { Bell, GitBranch, Puzzle, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertsSettings } from '@/app/components/project-settings/alerts';
 import { EnvironmentSettings } from '@/app/components/project-settings/environment';
