@@ -140,7 +140,7 @@ export function PrimaryRail() {
               collapsed={collapsed}
               to="/connections"
               icon={Plug}
-              label={t('Integrations')}
+              label={t('Connections')}
               isActive={({ pathname }) => pathname.startsWith('/connections')}
             />
             <RailNavButton

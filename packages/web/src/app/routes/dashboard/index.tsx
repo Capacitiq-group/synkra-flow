@@ -222,13 +222,13 @@ export function DashboardPage() {
             <div className="flex items-center justify-between">
               <h2 className="font-medium flex items-center gap-2">
                 <Plug className="h-4 w-4 text-gray-11" />
-                {t('Integrations')}
+                {t('Connections')}
               </h2>
               <Link
                 to="/integrations"
                 className="text-sm text-primary hover:underline"
               >
-                {t('Manage')}
+                {t('Manage Connections')}
               </Link>
             </div>
             <div className="text-3xl font-semibold">

@@ -11,7 +11,7 @@ import { otpGenerator } from './lib/otp-generator'
 import { OtpEntity } from './otp-entity'
 
 const OTP_EXPIRATION_MS: Record<OtpType, number> = {
-    [OtpType.EMAIL_VERIFICATION]: 24 * 60 * 60 * 1000,
+    [OtpType.EMAIL_VERIFICATION]: 10 * 60 * 1000,
     [OtpType.PASSWORD_RESET]: 10 * 60 * 1000,
     [OtpType.EMAIL_LOGIN]: 10 * 60 * 1000,
 }
@@ -19,6 +19,9 @@ const HASHED_OTP_VERSION = 1
 const MAX_ATTEMPTS = 5
 const MAX_ATTEMPTS_PER_IDENTITY = 10
 const IDENTITY_BUDGET_WINDOW_SECONDS = 60 * 60
+const SEND_RATE_LIMIT_PER_EMAIL = 3
+const SEND_RATE_LIMIT_PER_IP = 10
+const SEND_RATE_WINDOW_SECONDS = 60 * 60
 
 const repo = repoFactory(OtpEntity)
 
@@ -27,12 +30,30 @@ export const otpService = (log: FastifyBaseLogger) => ({
         platformId,
         email,
         type,
+        ip,
     }: CreateParams): Promise<void> {
         const userIdentity = await userIdentityService(log).getIdentityByEmail(email)
         if (!userIdentity) {
             return
         }
         const identityId = userIdentity.id
+        // Rate limit: per-email and per-IP, sliding 1h window
+        const emailKey = `otp-send-rate-email:${identityId}`
+        const emailCount = (await distributedStore.get<number>(emailKey)) ?? 0
+        if (emailCount >= SEND_RATE_LIMIT_PER_EMAIL) {
+            log.warn({ identityId, type, emailCount }, '[otpService#createAndSend] per-email rate limit hit')
+            return
+        }
+        await distributedStore.put(emailKey, emailCount + 1, SEND_RATE_WINDOW_SECONDS)
+        if (ip) {
+            const ipKey = `otp-send-rate-ip:${ip}`
+            const ipCount = (await distributedStore.get<number>(ipKey)) ?? 0
+            if (ipCount >= SEND_RATE_LIMIT_PER_IP) {
+                log.warn({ identityId, type, ip, ipCount }, '[otpService#createAndSend] per-IP rate limit hit')
+                return
+            }
+            await distributedStore.put(ipKey, ipCount + 1, SEND_RATE_WINDOW_SECONDS)
+        }
         const code = await distributedLock(log).runExclusive({
             key: confirmLockKey({ identityId, type }),
             timeoutInSeconds: 15,
@@ -171,6 +192,7 @@ async function clearIdentityBudget({ identityId, type }: IdentityBudgetParams): 
 }
 
 type CreateParams = {
+    ip?: string;
     platformId: PlatformId | null
     email: string
     type: OtpType

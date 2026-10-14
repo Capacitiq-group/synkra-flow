@@ -31,6 +31,10 @@ import { userHooks } from '@/hooks/user-hooks';
 
 import { ProjectSettingsDialog } from '../project-settings';
 
+const CHAT_WIDGET_URL =
+  'https://chat.synkra.co.za/widget?website_token=DNXCEpRQaLug9G2EAxt4BGiG';
+
+
 export const ProjectDashboardPageHeader = ({
   children,
   description,
@@ -108,6 +112,27 @@ export const ProjectDashboardPageHeader = ({
         titleClassName="text-sm font-medium"
         projectType={project.type}
       />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              href={CHAT_WIDGET_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded border border-amber-6 bg-amber-2 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-amber-11 no-underline hover:bg-amber-3"
+            >
+              BETA
+            </a>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              {t(
+                'Pre-release version. Report issues or share feedback via chat.',
+              )}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {project.type === ProjectType.PERSONAL && (
         <TooltipProvider>
           <Tooltip>

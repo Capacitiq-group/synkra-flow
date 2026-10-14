@@ -32,12 +32,12 @@ const TABS: {
 }[] = [
   { id: 'members', label: 'Members', icon: Users },
   { id: 'alerts', label: 'Alert Emails', icon: Bell },
-  { id: 'pieces', label: 'Integrations', icon: Puzzle },
+  { id: 'pieces', label: 'Connections', icon: Puzzle },
   { id: 'environment', label: 'Environment', icon: GitBranch },
 ];
 
 export function WorkspaceSettingsPage() {
-  const params = useParams<{ section?: string }>();
+  const params = useParams<{ section?: string; sub?: string }>();
   const navigate = useNavigate();
   const { checkAccess } = useAuthorization();
   const { project } = projectCollectionUtils.useCurrentProject();
@@ -48,10 +48,12 @@ export function WorkspaceSettingsPage() {
   const { platform } = platformHooks.useCurrentPlatform();
   const platformRole = userHooks.getCurrentUserPlatformRole();
 
+  const requestedTab = params.sub as TabId | undefined;
   const active: TabId = useMemo(() => {
-    const id = (params.section ?? '') as TabId;
-    return TABS.some((x) => x.id === id) ? id : (TABS[0]?.id ?? 'members');
-  }, [params.section]);
+    const visibleIds = TABS.map((x) => x.id);
+    if (requestedTab && visibleIds.includes(requestedTab)) return requestedTab;
+    return TABS[0]?.id ?? 'alerts';
+  }, [requestedTab]);
 
   const projectId = authenticationSession.getProjectId();
   const base = projectId
