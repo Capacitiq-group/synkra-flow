@@ -6935,6 +6935,19 @@
         "tslib": "2.6.2",
       },
     },
+    "packages/pieces/community/paygate": {
+      "name": "@synkra/piece-paygate",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/paywhirl": {
       "name": "@activepieces/piece-paywhirl",
       "version": "0.1.0",
@@ -7002,6 +7015,19 @@
       },
       "devDependencies": {
         "tslib": "^2.3.0",
+      },
+    },
+    "packages/pieces/community/peach-payments": {
+      "name": "@synkra/piece-peach-payments",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
       },
     },
     "packages/pieces/community/peekshot": {
@@ -14501,6 +14527,10 @@
     "@synkra/piece-pargo": ["@synkra/piece-pargo@workspace:packages/pieces/community/pargo"],
 
     "@synkra/piece-payfast": ["@synkra/piece-payfast@workspace:packages/pieces/community/payfast"],
+
+    "@synkra/piece-paygate": ["@synkra/piece-paygate@workspace:packages/pieces/community/paygate"],
+
+    "@synkra/piece-peach-payments": ["@synkra/piece-peach-payments@workspace:packages/pieces/community/peach-payments"],
 
     "@synkra/piece-snapscan": ["@synkra/piece-snapscan@workspace:packages/pieces/community/snapscan"],
 

@@ -71,6 +71,16 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
     version: '0.1.0',
     file: 'synkra-piece-snapscan-0.1.0.tgz',
   },
+  {
+    name: '@synkra/piece-peach-payments',
+    version: '0.1.0',
+    file: 'synkra-piece-peach-payments-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-paygate',
+    version: '0.1.0',
+    file: 'synkra-piece-paygate-0.1.0.tgz',
+  },
 ];
 
 /**
