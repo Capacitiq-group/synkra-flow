@@ -25,6 +25,14 @@ const WorkspaceSettingsPage = lazyWithRetry(
   'workspace-settings',
 );
 
+const ApiSettingsPage = lazyWithRetry(
+  () =>
+    import('./api').then((m) => ({
+      default: m.ApiSettingsPage,
+    })),
+  'api-settings',
+);
+
 const AccountSettingsPage = lazyWithRetry(
   () =>
     import('./account').then((m) => ({
@@ -56,6 +64,8 @@ export function SettingsPage() {
             return <AccountSettingsPage />;
           case 'security':
             return <SecuritySettingsPage />;
+          case 'api':
+            return <ApiSettingsPage />;
           default:
             return null;
         }

@@ -20,6 +20,10 @@ import { platformHooks } from '@/hooks/platform-hooks';
 // Enterprise upsell hidden for beta. Flip to true to re-enable.
 const SHOW_MANAGE_PIECES_UPSELL = false;
 
+// Package name / version columns hidden for user-facing settings.
+void Hash;
+void GitBranch;
+
 const columns: ColumnDef<RowDataWithActions<PieceMetadataModelSummary>>[] = [
   {
     accessorKey: 'name',
@@ -51,32 +55,6 @@ const columns: ColumnDef<RowDataWithActions<PieceMetadataModelSummary>>[] = [
     ),
     cell: ({ row }) => {
       return <div className="text-left">{row.original.displayName}</div>;
-    },
-  },
-  {
-    accessorKey: 'packageName',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={t('Package Name')}
-        icon={Hash}
-      />
-    ),
-    cell: ({ row }) => {
-      return <div className="text-left">{row.original.name}</div>;
-    },
-  },
-  {
-    accessorKey: 'version',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={t('Version')}
-        icon={GitBranch}
-      />
-    ),
-    cell: ({ row }) => {
-      return <div className="text-left">{row.original.version}</div>;
     },
   },
 ];

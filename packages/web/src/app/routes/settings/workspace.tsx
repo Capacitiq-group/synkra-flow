@@ -36,6 +36,12 @@ const TABS: {
   { id: 'environment', label: 'Environment', icon: GitBranch },
 ];
 
+// Hidden for beta. Flip to true to re-enable.
+const SHOW_PIECES_TAB = false;
+const SHOW_ENVIRONMENT_TAB = false;
+void Puzzle;
+void GitBranch;
+
 export function WorkspaceSettingsPage() {
   const params = useParams<{ section?: string; sub?: string }>();
   const navigate = useNavigate();
@@ -70,16 +76,19 @@ export function WorkspaceSettingsPage() {
   }, [project.id]);
 
   const visibleTabs = TABS.filter((tab) => {
-    if (tab.id === 'members')
+    const id = String(tab.id);
+    if (id === 'pieces') return SHOW_PIECES_TAB;
+    if (id === 'environment') return SHOW_ENVIRONMENT_TAB;
+    if (id === 'members') {
       return (
         project.type === ProjectType.TEAM &&
         checkAccess(Permission.READ_PROJECT_MEMBER) &&
         !!showProjectMembers
       );
-    if (tab.id === 'alerts')
+    }
+    if (id === 'alerts') {
       return checkAccess(Permission.READ_ALERT) && !!showAlerts;
-    if (tab.id === 'environment')
-      return checkAccess(Permission.READ_PROJECT_RELEASE);
+    }
     return true;
   });
 
