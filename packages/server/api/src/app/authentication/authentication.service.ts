@@ -38,6 +38,53 @@ export const authenticationService = (log: FastifyBaseLogger) => ({
                 email: params.email,
                 platformId,
             })
+
+            // ── Synkra beta gate ──
+            // Runs only when AP_SYNKRA_BETA_GATE_ENABLED=true.
+            // Four safety conditions, all must hold before we reject:
+            //   1. Gate is enabled via env var
+            //   2. Email is not in the owner whitelist (comma-separated env)
+            //   3. Email is not already a user (existing users always allowed)
+            //   4. Email is not approved in synkra_beta_application
+            if (process.env.AP_SYNKRA_BETA_GATE_ENABLED === 'true') {
+                const normalizedEmail = params.email.toLowerCase().trim()
+                const whitelist = (process.env.AP_SYNKRA_BETA_WHITELIST_EMAILS ?? '')
+                    .split(',')
+                    .map((e) => e.toLowerCase().trim())
+                    .filter((e) => e.length > 0)
+
+                if (!whitelist.includes(normalizedEmail)) {
+                    // Existing users pass. Only brand-new emails get beta-checked.
+                    const existingIdentity = await userIdentityService(log)
+                        .getIdentityByEmail(normalizedEmail)
+                        .catch(() => null)
+
+                    if (isNil(existingIdentity)) {
+                        const { synkraBetaService } = await import('../synkra/beta/beta.service')
+                        const approved = await synkraBetaService(log).isEmailApproved(normalizedEmail)
+
+                        if (!approved) {
+                            log.info(
+                                { email: normalizedEmail },
+                                'synkra beta gate: signup rejected (email not approved)',
+                            )
+                            throw new ActivepiecesError({
+                                code: ErrorCode.VALIDATION,
+                                params: {
+                                    message:
+                                        'Synkra Flow is currently in private beta. Apply for access at https://synkra.co.za/flow',
+                                },
+                            })
+                        }
+                        log.info(
+                            { email: normalizedEmail },
+                            'synkra beta gate: signup approved',
+                        )
+                    }
+                }
+            }
+            // ── End Synkra beta gate ──
+
             if (system.get(AppSystemProp.ALLOW_OPEN_SIGN_UP) !== 'true') {
                 await authenticationUtils(log).assertUserIsInvitedToPlatformOrProject({
                     email: params.email,
@@ -257,8 +304,21 @@ async function sendVerificationOrAutoVerify(userIdentity: UserIdentity, log: Fas
             }
             break
         case ApEdition.COMMUNITY:
-        case ApEdition.ENTERPRISE:
             await userIdentityService(log).verify(userIdentity.id)
+            break
+        case ApEdition.ENTERPRISE:
+            // Synkra: enforce email verification in EE too (default AP auto-verifies).
+            if (environment === ApEnvironment.DEVELOPMENT) {
+                await userIdentityService(log).verify(userIdentity.id)
+                break
+            }
+            if (!userIdentity.verified) {
+                await otpService(log).createAndSend({
+                    platformId: null,
+                    email: userIdentity.email,
+                    type: OtpType.EMAIL_VERIFICATION,
+                })
+            }
             break
     }
 }

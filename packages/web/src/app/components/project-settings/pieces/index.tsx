@@ -17,6 +17,9 @@ import { PieceIcon, piecesHooks } from '@/features/pieces';
 import { projectCollectionUtils } from '@/features/projects';
 import { platformHooks } from '@/hooks/platform-hooks';
 
+// Enterprise upsell hidden for beta. Flip to true to re-enable.
+const SHOW_MANAGE_PIECES_UPSELL = false;
+
 const columns: ColumnDef<RowDataWithActions<PieceMetadataModelSummary>>[] = [
   {
     accessorKey: 'name',
@@ -103,7 +106,7 @@ const PiecesSettings = () => {
 
   return (
     <div className="space-y-6">
-      {!platform.plan.managePiecesEnabled && (
+      {SHOW_MANAGE_PIECES_UPSELL && !platform.plan.managePiecesEnabled && (
         <LockedAlert
           title={t('Control Pieces')}
           description={t(

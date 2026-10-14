@@ -32,6 +32,7 @@ export type ProjectDashboardLayoutHeaderTab = {
   show: boolean;
   beta?: boolean;
   badgeCount?: number;
+  infoTerm?: string;
 };
 
 const ProjectChangedRedirector = ({

@@ -105,22 +105,19 @@ export const synkraDashboardController: FastifyPluginAsyncZod = async (app) => {
       }
 
       // Connected integrations count.
+      // Count all project-scoped connections whose project belongs to this platform.
+      // Previous version passed projectId: null which filtered to platform-scope
+      // (global) connections only — always 0 for normal users.
       let connectedIntegrations = 0;
       try {
-        const { appConnectionService } = await import('../../app-connection/app-connection-service/app-connection-service');
-        const conns = await appConnectionService(request.log).list({
-          projectId: null,
-          platformId,
-          cursorRequest: null,
-          limit: 100,
-          displayName: undefined,
-          status: undefined,
-          pieceName: undefined,
-          scope: undefined,
-          ownerIds: [],
-          externalIds: [],
-        });
-        connectedIntegrations = conns.data.length;
+        const { appConnectionsRepo } = await import('../../app-connection/app-connection-service/app-connection-service');
+        const { AppConnectionStatus } = await import('@activepieces/shared');
+        connectedIntegrations = await appConnectionsRepo()
+          .createQueryBuilder('ac')
+          .innerJoin('project', 'p', 'p.id = ac."projectId"')
+          .where('p."platformId" = :platformId', { platformId })
+          .andWhere('ac.status = :status', { status: AppConnectionStatus.ACTIVE })
+          .getCount();
       } catch (err) {
         request.log.warn({ err }, 'dashboard: connections query failed');
       }

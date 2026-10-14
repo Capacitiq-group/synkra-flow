@@ -56,7 +56,7 @@ export function BuilderNudge() {
     if (!flowVersion) return 'needs_trigger';
 
     const hasTrigger = !!flowVersion.trigger && !!(flowVersion.trigger as { name?: string }).name;
-    const actions = (flowVersion.actions ?? []) as unknown[];
+    const actions = ((flowVersion as unknown as { actions?: unknown[] }).actions ?? []);
     const hasAction = actions.length > 0;
 
     if (!hasTrigger) return 'needs_trigger';
