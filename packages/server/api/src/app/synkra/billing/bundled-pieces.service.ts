@@ -81,6 +81,16 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
     version: '0.1.0',
     file: 'synkra-piece-paygate-0.1.0.tgz',
   },
+  {
+    name: '@synkra/piece-takealot',
+    version: '0.1.0',
+    file: 'synkra-piece-takealot-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-drop',
+    version: '0.1.0',
+    file: 'synkra-piece-drop-0.1.0.tgz',
+  },
 ];
 
 /**

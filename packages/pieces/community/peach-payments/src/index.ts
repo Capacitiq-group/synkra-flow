@@ -10,7 +10,7 @@ export const peachPayments = createPiece({
   description:
     'South African card and alternative payment gateway. Create checkout sessions, look up payments, issue refunds, and react to completed payments.',
   minimumSupportedRelease: '0.92.0',
-  logoUrl: 'https://res.cloudinary.com/dewvhnks3/image/upload/v1791963600/peach-payments-placeholder.png',
+  logoUrl: 'https://res.cloudinary.com/dewvhnks3/image/upload/v1791967830/images_3_perwg4.jpg',
   categories: [PieceCategory.PAYMENT_PROCESSING, PieceCategory.COMMERCE],
   auth: peachAuth,
   authors: ['synkra'],

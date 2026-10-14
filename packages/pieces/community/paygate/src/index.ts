@@ -9,7 +9,7 @@ export const paygate = createPiece({
   description:
     'South African payment gateway. Build signed payment requests, query transaction state, and react to completed payments.',
   minimumSupportedRelease: '0.92.0',
-  logoUrl: 'https://res.cloudinary.com/dewvhnks3/image/upload/v1791963600/paygate-placeholder.png',
+  logoUrl: 'https://res.cloudinary.com/dewvhnks3/image/upload/v1791967829/images_9_ayey2t.png',
   categories: [PieceCategory.PAYMENT_PROCESSING, PieceCategory.COMMERCE],
   auth: paygateAuth,
   authors: ['synkra'],
