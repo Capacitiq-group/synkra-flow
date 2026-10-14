@@ -6776,6 +6776,19 @@
         "tslib": "2.6.2",
       },
     },
+    "packages/pieces/community/ozow": {
+      "name": "@synkra/piece-ozow",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/paddle": {
       "name": "@activepieces/piece-paddle",
       "version": "0.1.0",
@@ -8669,6 +8682,19 @@
       },
       "devDependencies": {
         "tslib": "^2.3.0",
+      },
+    },
+    "packages/pieces/community/snapscan": {
+      "name": "@synkra/piece-snapscan",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
       },
     },
     "packages/pieces/community/snowflake": {
@@ -14470,9 +14496,13 @@
 
     "@synkra/piece-ikhokha": ["@synkra/piece-ikhokha@workspace:packages/pieces/community/ikhokha"],
 
+    "@synkra/piece-ozow": ["@synkra/piece-ozow@workspace:packages/pieces/community/ozow"],
+
     "@synkra/piece-pargo": ["@synkra/piece-pargo@workspace:packages/pieces/community/pargo"],
 
     "@synkra/piece-payfast": ["@synkra/piece-payfast@workspace:packages/pieces/community/payfast"],
+
+    "@synkra/piece-snapscan": ["@synkra/piece-snapscan@workspace:packages/pieces/community/snapscan"],
 
     "@synkra/piece-synkra-chat": ["@synkra/piece-synkra-chat@workspace:packages/pieces/community/synkra-chat"],
 

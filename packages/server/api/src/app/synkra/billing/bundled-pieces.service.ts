@@ -61,6 +61,16 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
     version: '0.1.0',
     file: 'synkra-piece-pargo-0.1.0.tgz',
   },
+  {
+    name: '@synkra/piece-ozow',
+    version: '0.1.0',
+    file: 'synkra-piece-ozow-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-snapscan',
+    version: '0.1.0',
+    file: 'synkra-piece-snapscan-0.1.0.tgz',
+  },
 ];
 
 /**
