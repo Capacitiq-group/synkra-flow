@@ -106,9 +106,8 @@ const WORKERS_TAB_PATHS = { health: '', 'worker-groups': 'groups' };
 const AI_TAB_PATHS = { providers: '', capabilities: 'capabilities' };
 const PIECES_TAB_PATHS = { pieces: '', 'piece-sets': 'piece-sets' };
 
-const BetaAdminPage = lazyWithRetry(
-  () => import('./platform/beta').then((m) => ({ default: m.default })),
-  'beta-admin',
+const BetaAdminPage = React.lazy(() =>
+  import('./platform/beta').then((m) => ({ default: m.default })),
 );
 
 export const platformRoutes = [
