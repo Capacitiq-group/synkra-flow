@@ -76,6 +76,14 @@ const AppConnectionsPage = lazyWithRetry(
     import('./connections').then((m) => ({ default: m.AppConnectionsPage })),
   'connections',
 );
+const DeveloperPage = lazyWithRetry(
+  () =>
+    import('./developer').then((m) => ({
+      default: m.DeveloperPage,
+    })),
+  'developer-page',
+);
+
 const SettingsPage = lazyWithRetry(
   () => import('./settings').then((m) => ({ default: m.SettingsPage })),
   'settings-page',
@@ -143,6 +151,16 @@ export const projectRoutes = [
     ),
   },
 
+  {
+    path: '/developer/:section?',
+    element: (
+      <ProjectDashboardLayout>
+        <SuspenseWrapper>
+          <DeveloperPage />
+        </SuspenseWrapper>
+      </ProjectDashboardLayout>
+    ),
+  },
   {
     path: '/agency',
     element: (

@@ -1,15 +1,18 @@
 import {
   ALL_PRINCIPAL_TYPES,
   PrincipalType,
-  SeekPage,
 } from '@activepieces/shared';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { securityAccess } from '../../core/security/authorization/fastify-security';
+import { distributedStore } from '../../database/redis-connections';
 import { flowRepo } from '../../flows/flow/flow.repo';
 import { flowRunRepo } from '../../flows/flow-run/flow-run-service';
+import { flowRunService } from '../../flows/flow-run/flow-run-service';
 import { projectRepo } from '../../project/project-repo';
 import { platformService } from '../../platform/platform.service';
+import { appConnectionService } from '../../app-connection/app-connection-service/app-connection-service';
+import { AppConnectionStatus, FlowRunStatus, RunEnvironment } from '@activepieces/shared';
 import { synkraSubscriptionService } from '../billing/subscription.service';
 import { synkraUsageService } from '../billing/usage.service';
 
@@ -22,7 +25,86 @@ const runStatus = z.enum([
   'QUOTA_EXCEEDED',
 ]);
 
+const RATE_LIMIT_PER_MINUTE = 100;
+
+/**
+ * Per-API-key rate limiting using the shared Redis store.
+ * Returns true if the request is allowed, false if the key is over the limit.
+ * Fails open on Redis errors so a Redis outage cannot take down the API.
+ */
+async function checkRateLimit(
+  keyId: string,
+  log: { warn: (obj: Record<string, unknown>, msg: string) => void },
+): Promise<boolean> {
+  try {
+    const minute = Math.floor(Date.now() / 60000);
+    const redisKey = `synkra-public-api-rl:${keyId}:${minute}`;
+    const count = (await distributedStore.get<number>(redisKey)) ?? 0;
+    if (count >= RATE_LIMIT_PER_MINUTE) {
+      return false;
+    }
+    await distributedStore.put(redisKey, count + 1, 120);
+    return true;
+  } catch (err) {
+    log.warn({ err }, '[public-api] rate limit check failed, allowing');
+    return true;
+  }
+}
+
+/**
+ * Resolve the platform ID and API key ID from a SERVICE principal.
+ * Returns null if the principal is not a SERVICE principal or has no platform.
+ */
+function resolveServicePrincipal(
+  principal: unknown,
+): { platformId: string; keyId: string } | null {
+  const p = principal as {
+    type?: string;
+    id?: string;
+    platform?: { id?: string };
+  };
+  if (p.type !== 'SERVICE' || !p.platform?.id || !p.id) return null;
+  return { platformId: p.platform.id, keyId: p.id };
+}
+
 export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
+  // ────────────────────────────────────────────────────────────
+  // Auth + rate limit + audit preamble shared by all endpoints
+  // ────────────────────────────────────────────────────────────
+  async function gate(
+    request: { principal: unknown; log: { info: (o: Record<string, unknown>, m: string) => void; warn: (o: Record<string, unknown>, m: string) => void } },
+    reply: { status: (code: number) => { send: (body: unknown) => unknown } },
+    endpoint: string,
+  ): Promise<{ platformId: string; keyId: string } | null> {
+    const ctx = resolveServicePrincipal(request.principal);
+    if (!ctx) {
+      reply.status(403).send({ error: 'This endpoint requires an API key.' });
+      return null;
+    }
+    const allowed = await checkRateLimit(ctx.keyId, request.log);
+    if (!allowed) {
+      request.log.warn(
+        { keyId: ctx.keyId, endpoint },
+        '[public-api] rate limit exceeded',
+      );
+      reply
+        .status(429)
+        .send({ error: 'Rate limit exceeded. Max 100 requests per minute.' });
+      return null;
+    }
+    // Audit log — best effort, does not block
+    request.log.info(
+      {
+        synkraApiCall: true,
+        endpoint,
+        platformId: ctx.platformId,
+        keyId: ctx.keyId,
+      },
+      '[public-api] call',
+    );
+    return ctx;
+  }
+
   // ────────────────────────────────────────────────────────────
   // Who am I — returns the platform associated with the API key
   // ────────────────────────────────────────────────────────────
@@ -49,34 +131,45 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
             }),
           }),
           403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
         },
       },
     },
     async (request, reply) => {
-      const principal = request.principal;
-      if (principal.type !== PrincipalType.SERVICE) {
-        return reply.status(403).send({
-          error: 'This endpoint requires an API key.',
-        });
-      }
-      const platformId = (principal as unknown as { platform?: { id: string } }).platform?.id;
-      if (!platformId) {
-        return reply.status(403).send({ error: 'API key has no platform.' });
-      }
+      const ctx = await gate(request as never, reply as never, 'GET /me');
+      if (!ctx) return;
+      const { platformId } = ctx;
       const platform = await platformService(request.log).getOne(platformId as never);
-      const ownerId = platform?.ownerId ?? principal.id;
+      const ownerId = platform?.ownerId ?? (request.principal as { id: string }).id;
       const sub = await synkraSubscriptionService(request.log).getOrCreateForUser(ownerId);
       const usage = await synkraUsageService(request.log).getUsage(ownerId);
       const { getPlanLimits } = await import('@activepieces/shared');
       const plan = getPlanLimits(sub.tier);
 
+      // Real count of runs this month across the platform
+      let executionsThisMonth = 0;
+      try {
+        const now = new Date();
+        const monthStart = new Date(
+          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+        );
+        executionsThisMonth = await flowRunRepo()
+          .createQueryBuilder('fr')
+          .innerJoin('project', 'p', 'p.id = fr."projectId"')
+          .where('p."platformId" = :platformId', { platformId })
+          .andWhere('fr.created >= :start', { start: monthStart.toISOString() })
+          .getCount();
+      } catch (err) {
+        request.log.warn({ err }, '[public-api] executions count failed');
+      }
+
       return {
         platformId,
         platformName: platform?.name ?? null,
-        principalType: principal.type,
+        principalType: 'SERVICE',
         tier: sub.tier,
         usage: {
-          executionsThisMonth: usage.aiOpsUsed === undefined ? 0 : 0,
+          executionsThisMonth,
           aiOpsUsed: usage.aiOpsUsed,
           emailsUsed: usage.emailsUsed,
         },
@@ -110,19 +203,17 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
             ),
           }),
           403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
         },
       },
     },
     async (request, reply) => {
-      const principal = request.principal;
-      if (principal.type !== PrincipalType.SERVICE) {
-        return reply.status(403).send({ error: 'API key required.' });
-      }
-      const platformId = (principal as unknown as { platform?: { id: string } }).platform?.id;
-      if (!platformId) {
-        return reply.status(403).send({ error: 'API key has no platform.' });
-      }
-      const projects = await projectRepo().find({ where: { platformId } as never });
+      const ctx = await gate(request as never, reply as never, 'GET /flows');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const projects = await projectRepo().find({
+        where: { platformId } as never,
+      });
       const projectIds = projects.map((p) => p.id);
       if (projectIds.length === 0) return { flows: [] };
       const flows = await flowRepo()
@@ -140,6 +231,75 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
           created: new Date(f.created).toISOString(),
         })),
       };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // Trigger a flow — POST /flows/:id/run
+  // ────────────────────────────────────────────────────────────
+  app.post(
+    '/flows/:id/run',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z
+          .object({
+            input: z.record(z.string(), z.unknown()).optional(),
+          })
+          .optional(),
+        response: {
+          200: z.object({
+            runId: z.string(),
+            status: z.string(),
+          }),
+          400: z.object({ error: z.string() }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+          500: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(
+        request as never,
+        reply as never,
+        'POST /flows/:id/run',
+      );
+      if (!ctx) return;
+      const { platformId, keyId } = ctx;
+
+      const flow = await flowRepo().findOneBy({ id: request.params.id });
+      if (!flow) {
+        return reply.status(404).send({ error: 'Flow not found.' });
+      }
+      const project = await projectRepo().findOneBy({ id: flow.projectId });
+      if (!project || project.platformId !== platformId) {
+        return reply.status(403).send({ error: 'Flow is not on this platform.' });
+      }
+      if (!flow.publishedVersionId) {
+        return reply
+          .status(400)
+          .send({ error: 'Flow has no published version.' } as never);
+      }
+
+      try {
+        const run = await flowRunService(request.log).startManualTrigger({
+          projectId: flow.projectId,
+          flowVersionId: flow.publishedVersionId,
+          triggeredBy: `api-key:${keyId}`,
+        });
+        return {
+          runId: run.id,
+          status: run.status,
+        };
+      } catch (err) {
+        request.log.error({ err }, '[public-api] failed to start flow');
+        return reply
+          .status(500)
+          .send({ error: 'Failed to start flow.' } as never);
+      }
     },
   );
 
@@ -168,22 +328,19 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
             ),
           }),
           403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
         },
       },
     },
     async (request, reply) => {
-      const principal = request.principal;
-      if (principal.type !== PrincipalType.SERVICE) {
-        return reply.status(403).send({ error: 'API key required.' });
-      }
-      const platformId = (principal as unknown as { platform?: { id: string } }).platform?.id;
-      if (!platformId) {
-        return reply.status(403).send({ error: 'API key has no platform.' });
-      }
-      const projects = await projectRepo().find({ where: { platformId } as never });
+      const ctx = await gate(request as never, reply as never, 'GET /runs');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const projects = await projectRepo().find({
+        where: { platformId } as never,
+      });
       const projectIds = projects.map((p) => p.id);
       if (projectIds.length === 0) return { runs: [] };
-
       const qb = flowRunRepo()
         .createQueryBuilder('r')
         .where('r."projectId" IN (:...projectIds)', { projectIds })
@@ -200,7 +357,9 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
           status: r.status,
           created: new Date(r.created).toISOString(),
           finished: (r as unknown as { finishTime?: string }).finishTime
-            ? new Date((r as unknown as { finishTime: string }).finishTime).toISOString()
+            ? new Date(
+                (r as unknown as { finishTime: string }).finishTime,
+              ).toISOString()
             : null,
         })),
       };
@@ -219,23 +378,134 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
       },
     },
     async (request, reply) => {
-      const principal = request.principal;
-      if (principal.type !== PrincipalType.SERVICE) {
-        return reply.status(403).send({ error: 'API key required.' });
-      }
-      const platformId = (principal as unknown as { platform?: { id: string } }).platform?.id;
-      if (!platformId) {
-        return reply.status(403).send({ error: 'API key has no platform.' });
-      }
+      const ctx = await gate(
+        request as never,
+        reply as never,
+        'GET /runs/:id',
+      );
+      if (!ctx) return;
+      const { platformId } = ctx;
       const run = await flowRunRepo().findOneBy({ id: request.params.id });
       if (!run) {
         return reply.status(404).send({ error: 'Run not found.' } as never);
       }
       const project = await projectRepo().findOneBy({ id: run.projectId });
       if (!project || project.platformId !== platformId) {
-        return reply.status(403).send({ error: 'Forbidden.' });
+        return reply.status(403).send({ error: 'Forbidden.' } as never);
       }
       return run;
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // Connections — list active app connections on the platform
+  // ────────────────────────────────────────────────────────────
+  app.get(
+    '/connections',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        response: {
+          200: z.object({
+            connections: z.array(
+              z.object({
+                id: z.string(),
+                displayName: z.string(),
+                pieceName: z.string(),
+                projectId: z.string().nullable(),
+                status: z.string(),
+                created: z.string(),
+              }),
+            ),
+          }),
+          403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(
+        request as never,
+        reply as never,
+        'GET /connections',
+      );
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const page = await appConnectionService(request.log).list({
+        projectId: null,
+        projectIds: undefined,
+        ownerIds: [],
+        pieceName: undefined,
+        cursorRequest: null,
+        displayName: undefined,
+        status: [AppConnectionStatus.ACTIVE],
+        limit: 200,
+        scope: undefined,
+        platformId,
+        externalIds: [],
+      });
+      return {
+        connections: page.data.map((c) => ({
+          id: c.id,
+          displayName: c.displayName,
+          pieceName: c.pieceName,
+          projectId: (c.projectIds ?? [])[0] ?? null,
+          status: c.status,
+          created: new Date(c.created).toISOString(),
+        })),
+      };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // Delete a connection — DELETE /connections/:id
+  // ────────────────────────────────────────────────────────────
+  app.delete(
+    '/connections/:id',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        response: {
+          200: z.object({ ok: z.boolean() }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(
+        request as never,
+        reply as never,
+        'DELETE /connections/:id',
+      );
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const page = await appConnectionService(request.log).list({
+        projectId: null,
+        projectIds: undefined,
+        ownerIds: [],
+        pieceName: undefined,
+        cursorRequest: null,
+        displayName: undefined,
+        status: undefined,
+        limit: 200,
+        scope: undefined,
+        platformId,
+        externalIds: [],
+      });
+      const match = page.data.find((c) => c.id === request.params.id);
+      if (!match) {
+        return reply.status(404).send({ error: 'Connection not found.' });
+      }
+      await appConnectionService(request.log).delete({
+        id: request.params.id,
+        platformId,
+        ownerId: null,
+        projectId: null,
+      } as never);
+      return { ok: true };
     },
   );
 
@@ -258,7 +528,9 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
     },
     async (request) => {
       const principal = request.principal;
-      const pid = (principal as unknown as { platform?: { id: string } }).platform?.id ?? null;
+      const pid =
+        (principal as unknown as { platform?: { id: string } }).platform?.id ??
+        null;
       return {
         ok: true,
         principalType: principal.type,
@@ -266,4 +538,11 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
       };
     },
   );
+
+  // ────────────────────────────────────────────────────────────
+  // Unused import guard — keep declared even if not all used yet
+  // ────────────────────────────────────────────────────────────
+  void runStatus;
+  void FlowRunStatus;
+  void RunEnvironment;
 };

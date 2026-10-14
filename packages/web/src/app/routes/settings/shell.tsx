@@ -1,7 +1,6 @@
 import { t } from 'i18next';
 import {
   Building2,
-  Code2,
   KeyRound,
   SlidersHorizontal,
   UserCog,
@@ -17,8 +16,7 @@ type SectionId =
   | 'variables'
   | 'workspace'
   | 'account'
-  | 'security'
-  | 'api';
+  | 'security';
 
 type Section = {
   id: SectionId;
@@ -57,12 +55,6 @@ const SECTIONS: Section[] = [
     label: t('Security'),
     icon: KeyRound,
     description: t('Password, sessions, and two-factor authentication.'),
-  },
-  {
-    id: 'api',
-    label: t('API'),
-    icon: Code2,
-    description: t('API keys and developer documentation.'),
   },
 ];
 
