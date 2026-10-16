@@ -1,0 +1,5 @@
+import { z } from 'zod';
+export declare const UpdateTemplatesCategoriesFlagRequestBody: z.ZodObject<{
+    value: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+export type UpdateTemplatesCategoriesFlagRequestBody = z.infer<typeof UpdateTemplatesCategoriesFlagRequestBody>;

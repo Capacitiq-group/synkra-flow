@@ -33,6 +33,14 @@ const AccountSettingsPage = lazyWithRetry(
   'account-settings',
 );
 
+const AiSettingsPage = lazyWithRetry(
+  () =>
+    import('./ai').then((m) => ({
+      default: m.AiSettingsPage,
+    })),
+  'ai-settings',
+);
+
 const SecuritySettingsPage = lazyWithRetry(
   () =>
     import('./security').then((m) => ({
@@ -56,6 +64,8 @@ export function SettingsPage() {
             return <AccountSettingsPage />;
           case 'security':
             return <SecuritySettingsPage />;
+          case 'ai':
+            return <AiSettingsPage />;
           default:
             return null;
         }

@@ -1,5 +1,6 @@
 import { t } from 'i18next';
 import {
+  Brain,
   Building2,
   KeyRound,
   SlidersHorizontal,
@@ -16,7 +17,8 @@ type SectionId =
   | 'variables'
   | 'workspace'
   | 'account'
-  | 'security';
+  | 'security'
+  | 'ai';
 
 type Section = {
   id: SectionId;
@@ -55,6 +57,12 @@ const SECTIONS: Section[] = [
     label: t('Security'),
     icon: KeyRound,
     description: t('Password, sessions, and two-factor authentication.'),
+  },
+  {
+    id: 'ai',
+    label: t('AI'),
+    icon: Brain,
+    description: t('AI credits, providers, and bring-your-own-key.'),
   },
 ];
 

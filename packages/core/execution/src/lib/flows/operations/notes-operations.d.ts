@@ -1,0 +1,7 @@
+import { FlowVersion } from '../flow-version';
+import { AddNoteRequest, DeleteNoteRequest, UpdateNoteRequest } from '.';
+export declare const notesOperations: {
+    updateNote: (flowVersion: FlowVersion, request: UpdateNoteRequest) => FlowVersion;
+    deleteNote: (flowVersion: FlowVersion, request: DeleteNoteRequest) => FlowVersion;
+    addNote: (flowVersion: FlowVersion, request: AddNoteRequest) => FlowVersion;
+};

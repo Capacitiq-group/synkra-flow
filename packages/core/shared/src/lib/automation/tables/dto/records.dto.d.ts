@@ -1,0 +1,114 @@
+import { Cursor } from '@activepieces/core-utils';
+import { z } from 'zod';
+export declare const CreateRecordsRequest: z.ZodObject<{
+    records: z.ZodArray<z.ZodArray<z.ZodObject<{
+        fieldId: z.ZodString;
+        value: z.ZodPipe<z.ZodTransform<string | null | undefined, unknown>, z.ZodNullable<z.ZodString>>;
+    }, z.core.$strip>>>;
+    tableId: z.ZodString;
+}, z.core.$strip>;
+export type CreateRecordsRequest = z.infer<typeof CreateRecordsRequest>;
+export declare const UpdateRecordRequest: z.ZodObject<{
+    cells: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        fieldId: z.ZodString;
+        value: z.ZodPipe<z.ZodTransform<string | null | undefined, unknown>, z.ZodNullable<z.ZodString>>;
+    }, z.core.$strip>>>;
+    tableId: z.ZodString;
+    agentUpdate: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strip>;
+export type UpdateRecordRequest = z.infer<typeof UpdateRecordRequest>;
+export declare enum FilterOperator {
+    EQ = "eq",
+    NEQ = "neq",
+    GT = "gt",
+    GTE = "gte",
+    LT = "lt",
+    LTE = "lte",
+    CO = "co",
+    EXISTS = "exists",
+    NOT_EXISTS = "not_exists"
+}
+export declare const Filter: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.EQ>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.NEQ>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.GT>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.GTE>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.LT>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.LTE>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.CO>;
+    value: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.EXISTS>;
+}, z.core.$strip>, z.ZodObject<{
+    fieldId: z.ZodString;
+    operator: z.ZodLiteral<FilterOperator.NOT_EXISTS>;
+}, z.core.$strip>], "operator">;
+export type Filter = z.infer<typeof Filter>;
+export declare const ListRecordsRequest: z.ZodObject<{
+    tableId: z.ZodString;
+    limit: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    cursor: z.ZodOptional<z.ZodString>;
+    filters: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<any[] | undefined, unknown>, import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.EQ>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.NEQ>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.GT>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.GTE>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.LT>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.LTE>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.CO>;
+        value: z.ZodString;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.EXISTS>;
+    }, z.core.$strip>, z.ZodObject<{
+        fieldId: z.ZodString;
+        operator: z.ZodLiteral<FilterOperator.NOT_EXISTS>;
+    }, z.core.$strip>], "operator">>>>;
+}, z.core.$strip>;
+export type ListRecordsRequest = Omit<z.infer<typeof ListRecordsRequest>, 'cursor'> & {
+    cursor: Cursor | undefined;
+};
+export declare const DeleteRecordsRequest: z.ZodObject<{
+    tableId: z.ZodString;
+    ids: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+export type DeleteRecordsRequest = z.infer<typeof DeleteRecordsRequest>;

@@ -1,0 +1,163 @@
+import { AgentOutputFieldType, AgentTaskStatus, ContentBlockType, ToolCallStatus, ToolCallType } from '@activepieces/core-piece-types';
+import { z } from 'zod';
+export * from './tools';
+export * from './mcp';
+export * from './mcp-tool-name-util';
+export { AgentOutputFieldType, AgentPieceProps, AgentTaskStatus, ContentBlockType, ExecutionToolStatus, ToolCallStatus, ToolCallType, } from '@activepieces/core-piece-types';
+export type { AgentProviderModel } from '@activepieces/core-piece-types';
+export declare const AgentOutputField: z.ZodObject<{
+    displayName: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    type: z.ZodEnum<typeof AgentOutputFieldType>;
+}, z.core.$strip>;
+export type AgentOutputField = z.infer<typeof AgentOutputField>;
+export type AgentResult = {
+    prompt: string;
+    steps: AgentStepBlock[];
+    status: AgentTaskStatus;
+    structuredOutput?: unknown;
+    failure?: string;
+};
+export declare const MarkdownContentBlock: z.ZodObject<{
+    type: z.ZodLiteral<ContentBlockType.MARKDOWN>;
+    markdown: z.ZodString;
+}, z.core.$strip>;
+export type MarkdownContentBlock = z.infer<typeof MarkdownContentBlock>;
+declare const ToolCallBaseSchema: z.ZodObject<{
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type ToolCallBase = z.infer<typeof ToolCallBaseSchema>;
+export declare const ToolCallContentBlock: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.PIECE>;
+    pieceName: z.ZodString;
+    pieceVersion: z.ZodString;
+    actionName: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.FLOW>;
+    displayName: z.ZodString;
+    externalFlowId: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.MCP>;
+    displayName: z.ZodString;
+    serverUrl: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.KNOWLEDGE_BASE>;
+    displayName: z.ZodString;
+    sourceType: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.UNKNOWN>;
+    displayName: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>], "toolCallType">;
+export type ToolCallContentBlock = z.infer<typeof ToolCallContentBlock>;
+export declare const AgentStepBlock: z.ZodUnion<readonly [z.ZodObject<{
+    type: z.ZodLiteral<ContentBlockType.MARKDOWN>;
+    markdown: z.ZodString;
+}, z.core.$strip>, z.ZodDiscriminatedUnion<[z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.PIECE>;
+    pieceName: z.ZodString;
+    pieceVersion: z.ZodString;
+    actionName: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.FLOW>;
+    displayName: z.ZodString;
+    externalFlowId: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.MCP>;
+    displayName: z.ZodString;
+    serverUrl: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.KNOWLEDGE_BASE>;
+    displayName: z.ZodString;
+    sourceType: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    toolCallType: z.ZodLiteral<ToolCallType.UNKNOWN>;
+    displayName: z.ZodString;
+    type: z.ZodLiteral<ContentBlockType.TOOL_CALL>;
+    input: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    output: z.ZodOptional<z.ZodUnknown>;
+    toolName: z.ZodString;
+    status: z.ZodEnum<typeof ToolCallStatus>;
+    toolCallId: z.ZodString;
+    startTime: z.ZodString;
+    endTime: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>], "toolCallType">]>;
+export type AgentStepBlock = z.infer<typeof AgentStepBlock>;

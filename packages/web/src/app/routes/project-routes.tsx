@@ -151,7 +151,7 @@ export const projectRoutes = [
     ),
   },
 
-  {
+  ...ProjectRouterWrapper({
     path: '/developer/:section?',
     element: (
       <ProjectDashboardLayout>
@@ -160,7 +160,7 @@ export const projectRoutes = [
         </SuspenseWrapper>
       </ProjectDashboardLayout>
     ),
-  },
+  }),
   {
     path: '/agency',
     element: (

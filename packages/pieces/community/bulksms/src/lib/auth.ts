@@ -1,20 +1,37 @@
 import { HttpMethod, httpClient } from '@activepieces/pieces-common';
 
+/**
+ * BulkSMS JSON REST API client.
+ * Base URL: https://api.bulksms.com/v1
+ * Auth: HTTP Basic with token_id as username, token_secret as password.
+ * Docs: https://www.bulksms.com/developer/json/v1/
+ */
 export async function bulksmsRequest<T>(params: {
-  username: string;
-  password: string;
+  tokenId: string;
+  tokenSecret: string;
   method: HttpMethod;
   path: string;
   body?: unknown;
+  query?: Record<string, string>;
 }): Promise<T> {
-  const auth = Buffer.from(`${params.username}:${params.password}`).toString('base64');
+  const basic = Buffer.from(
+    `${params.tokenId}:${params.tokenSecret}`,
+  ).toString('base64');
+
+  const url = new URL(`https://api.bulksms.com/v1${params.path}`);
+  if (params.query) {
+    for (const [k, v] of Object.entries(params.query)) {
+      url.searchParams.append(k, v);
+    }
+  }
+
   const response = await httpClient.sendRequest<T>({
     method: params.method,
-    url: `https://bulksms.2way.co.za/eapi/submission${params.path}`,
+    url: url.toString(),
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      Authorization: `Basic ${auth}`,
+      Authorization: `Basic ${basic}`,
     },
     body: params.body,
   });

@@ -1,0 +1,41 @@
+import { z } from 'zod';
+import { ApplicationEventName } from '../audit-events/index';
+import { EventDestinationFormat, EventDestinationScope } from './dto';
+export declare const EventDestinationPlatformScope: z.ZodObject<{
+    scope: z.ZodLiteral<EventDestinationScope.PLATFORM>;
+    platformId: z.ZodString;
+    events: z.ZodArray<z.ZodEnum<typeof ApplicationEventName>>;
+    url: z.ZodURL;
+    enabled: z.ZodBoolean;
+    headers: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>>;
+    format: z.ZodEnum<typeof EventDestinationFormat>;
+    id: import("zod/mini").ZodMiniString<string>;
+    created: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+    updated: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+}, z.core.$strip>;
+export declare const EventDestination: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    scope: z.ZodLiteral<EventDestinationScope.PLATFORM>;
+    platformId: z.ZodString;
+    events: z.ZodArray<z.ZodEnum<typeof ApplicationEventName>>;
+    url: z.ZodURL;
+    enabled: z.ZodBoolean;
+    headers: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>>;
+    format: z.ZodEnum<typeof EventDestinationFormat>;
+    id: import("zod/mini").ZodMiniString<string>;
+    created: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+    updated: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+}, z.core.$strip>, z.ZodObject<{
+    scope: z.ZodLiteral<EventDestinationScope.PROJECT>;
+    projectId: z.ZodString;
+    platformId: z.ZodString;
+    events: z.ZodArray<z.ZodEnum<typeof ApplicationEventName>>;
+    url: z.ZodURL;
+    enabled: z.ZodBoolean;
+    headers: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>>;
+    format: z.ZodEnum<typeof EventDestinationFormat>;
+    id: import("zod/mini").ZodMiniString<string>;
+    created: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+    updated: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+}, z.core.$strip>], "scope">;
+export type EventDestination = z.infer<typeof EventDestination>;
+export * from './dto';

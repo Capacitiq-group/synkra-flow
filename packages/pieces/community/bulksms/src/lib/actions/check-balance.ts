@@ -5,16 +5,17 @@ import { bulksmsRequest } from '../auth';
 
 export const checkBalance = createAction({
   name: 'check_balance',
-  displayName: 'Check Balance',
-  description: 'Get your remaining BulkSMS credit balance.',
+  displayName: 'Check Account',
+  description:
+    'Get your BulkSMS credit balance, remaining quota, and account details.',
   auth: bulksmsAuth,
   props: {},
   async run({ auth }) {
     return bulksmsRequest({
-      username: auth.props.username,
-      password: auth.props.password,
+      tokenId: auth.props.tokenId,
+      tokenSecret: auth.props.tokenSecret,
       method: HttpMethod.GET,
-      path: '/balance',
+      path: '/profile',
     });
   },
 });

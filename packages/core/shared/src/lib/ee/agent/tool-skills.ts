@@ -199,7 +199,7 @@ const AGENT_SKILLS: readonly AgentSkill[] = [
     { name: 'http_fallback', loadWhen: 'when calling an API directly because no connection exists', guideTopic: 'http_fallback', entersBuildPhase: false, toolNames: [] },
     { name: 'ai', loadWhen: 'when a flow uses native AI steps or needs to pick an AI model', guideTopic: 'ai', entersBuildPhase: false, toolNames: ['ap_list_ai_models'] },
     { name: 'build_flow_advanced', loadWhen: 'when a flow needs dedup, loops over many items, or formula expressions', guideTopic: 'build_flow_advanced', entersBuildPhase: false, toolNames: [] },
-    { name: 'about_activepieces', loadWhen: 'when asked what Activepieces is, how it is hosted or priced', guideTopic: 'about_activepieces', entersBuildPhase: false, toolNames: [] },
+    { name: 'about_synkra', loadWhen: 'when asked what Synkra Flow is, how it is hosted, priced, or which programmes exist', guideTopic: 'about_synkra', entersBuildPhase: false, toolNames: [] },
 ]
 
 export const agentToolSkills = {

@@ -1,0 +1,26 @@
+export declare const formErrors: {
+    readonly required: "required";
+    readonly invalidGitRepoSlug: "invalidGitRepoSlug";
+    readonly invalidGitRepoBranch: "invalidGitRepoBranch";
+    readonly invalidGitRepoRemoteUrl: "invalidGitRepoRemoteUrl";
+    readonly invalidExternalId: "invalidExternalId";
+    readonly invalidFileName: "invalidFileName";
+    readonly messageRequiresContentOrFiles: "messageRequiresContentOrFiles";
+    readonly agentConfigTooLarge: "agentConfigTooLarge";
+    readonly invalidGcpResourceId: "invalidGcpResourceId";
+    readonly duplicateRouteName: "duplicateRouteName";
+    readonly atLeastOne: "atLeastOne";
+    readonly wholeNumber: "wholeNumber";
+    readonly atMostTenThousand: "atMostTenThousand";
+    readonly tierNameTooLong: "tierNameTooLong";
+    readonly tierDescriptionTooLong: "tierDescriptionTooLong";
+    readonly invalidEmoji: "invalidEmoji";
+    readonly tierTooManyModels: "tierTooManyModels";
+    readonly tierDuplicateModel: "tierDuplicateModel";
+    readonly tierThinkingBudgetInvalid: "tierThinkingBudgetInvalid";
+    readonly invalidHeaderName: "invalidHeaderName";
+    readonly reservedHeaderName: "reservedHeaderName";
+    readonly duplicateHeaderName: "duplicateHeaderName";
+    readonly invalidHeaderValue: "invalidHeaderValue";
+};
+export declare const SAFE_EXTERNAL_ID_PATTERN: RegExp;

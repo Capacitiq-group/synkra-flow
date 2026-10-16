@@ -1,0 +1,26 @@
+import { z } from 'zod';
+export declare enum NoteColorVariant {
+    ORANGE = "orange",
+    RED = "red",
+    GREEN = "green",
+    BLUE = "blue",
+    PURPLE = "purple",
+    YELLOW = "yellow"
+}
+export declare const Note: z.ZodObject<{
+    id: z.ZodString;
+    content: z.ZodString;
+    ownerId: import("zod/mini").ZodMiniOptional<import("zod/mini").ZodMiniNullable<z.ZodString>>;
+    color: z.ZodEnum<typeof NoteColorVariant>;
+    position: z.ZodObject<{
+        x: z.ZodNumber;
+        y: z.ZodNumber;
+    }, z.core.$strip>;
+    size: z.ZodObject<{
+        width: z.ZodNumber;
+        height: z.ZodNumber;
+    }, z.core.$strip>;
+    createdAt: z.ZodString;
+    updatedAt: z.ZodString;
+}, z.core.$strip>;
+export type Note = z.infer<typeof Note>;

@@ -1,0 +1,60 @@
+import { z } from 'zod';
+export declare enum EmbedSubdomainStatus {
+    PENDING_VERIFICATION = "PENDING_VERIFICATION",
+    ACTIVE = "ACTIVE",
+    FAILED = "FAILED"
+}
+export declare enum EmbedVerificationRecordType {
+    CNAME = "CNAME",
+    TXT = "TXT"
+}
+export declare enum EmbedVerificationRecordPurpose {
+    HOSTNAME = "HOSTNAME",
+    OWNERSHIP = "OWNERSHIP",
+    SSL = "SSL"
+}
+export declare const EmbedVerificationRecord: z.ZodObject<{
+    type: z.ZodEnum<{
+        CNAME: EmbedVerificationRecordType.CNAME;
+        TXT: EmbedVerificationRecordType.TXT;
+    }>;
+    name: z.ZodString;
+    value: z.ZodString;
+    purpose: z.ZodEnum<{
+        HOSTNAME: EmbedVerificationRecordPurpose.HOSTNAME;
+        OWNERSHIP: EmbedVerificationRecordPurpose.OWNERSHIP;
+        SSL: EmbedVerificationRecordPurpose.SSL;
+    }>;
+}, z.core.$strip>;
+export type EmbedVerificationRecord = z.infer<typeof EmbedVerificationRecord>;
+export declare const EmbedSubdomain: z.ZodObject<{
+    platformId: z.ZodString;
+    hostname: z.ZodString;
+    status: z.ZodEnum<{
+        PENDING_VERIFICATION: EmbedSubdomainStatus.PENDING_VERIFICATION;
+        ACTIVE: EmbedSubdomainStatus.ACTIVE;
+        FAILED: EmbedSubdomainStatus.FAILED;
+    }>;
+    cloudflareId: z.ZodString;
+    verificationRecords: z.ZodArray<z.ZodObject<{
+        type: z.ZodEnum<{
+            CNAME: EmbedVerificationRecordType.CNAME;
+            TXT: EmbedVerificationRecordType.TXT;
+        }>;
+        name: z.ZodString;
+        value: z.ZodString;
+        purpose: z.ZodEnum<{
+            HOSTNAME: EmbedVerificationRecordPurpose.HOSTNAME;
+            OWNERSHIP: EmbedVerificationRecordPurpose.OWNERSHIP;
+            SSL: EmbedVerificationRecordPurpose.SSL;
+        }>;
+    }, z.core.$strip>>;
+    id: import("zod/mini").ZodMiniString<string>;
+    created: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+    updated: import("zod/mini").ZodMiniPipe<import("zod/mini").ZodMiniTransform<unknown, unknown>, import("zod/mini").ZodMiniString<string>>;
+}, z.core.$strip>;
+export type EmbedSubdomain = z.infer<typeof EmbedSubdomain>;
+export declare const GenerateEmbedSubdomainRequest: z.ZodObject<{
+    hostname: z.ZodCustomStringFormat<"hostname">;
+}, z.core.$strip>;
+export type GenerateEmbedSubdomainRequest = z.infer<typeof GenerateEmbedSubdomainRequest>;

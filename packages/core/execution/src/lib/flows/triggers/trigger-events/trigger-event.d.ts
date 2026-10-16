@@ -1,0 +1,20 @@
+import { z } from 'zod';
+import { BaseModel } from '@activepieces/core-utils';
+export type TriggerEventId = string;
+export declare const TriggerEvent: z.ZodObject<{
+    id: z.ZodString;
+    projectId: z.ZodString;
+    flowId: z.ZodString;
+    sourceName: z.ZodString;
+    fileId: z.ZodString;
+}, z.core.$strip>;
+export type TriggerEvent = z.infer<typeof TriggerEvent> & BaseModel<TriggerEventId>;
+export declare const TriggerEventWithPayload: z.ZodObject<{
+    id: z.ZodString;
+    projectId: z.ZodString;
+    flowId: z.ZodString;
+    sourceName: z.ZodString;
+    fileId: z.ZodString;
+    payload: z.ZodUnknown;
+}, z.core.$strip>;
+export type TriggerEventWithPayload = z.infer<typeof TriggerEventWithPayload>;

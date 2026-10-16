@@ -1,0 +1,69 @@
+export declare enum Permission {
+    READ_APP_CONNECTION = "READ_APP_CONNECTION",
+    WRITE_APP_CONNECTION = "WRITE_APP_CONNECTION",
+    READ_FLOW = "READ_FLOW",
+    WRITE_FLOW = "WRITE_FLOW",
+    UPDATE_FLOW_STATUS = "UPDATE_FLOW_STATUS",
+    WRITE_INVITATION = "WRITE_INVITATION",
+    READ_INVITATION = "READ_INVITATION",
+    READ_PROJECT_MEMBER = "READ_PROJECT_MEMBER",
+    WRITE_PROJECT_MEMBER = "WRITE_PROJECT_MEMBER",
+    WRITE_PROJECT_RELEASE = "WRITE_PROJECT_RELEASE",
+    READ_PROJECT_RELEASE = "READ_PROJECT_RELEASE",
+    READ_RUN = "READ_RUN",
+    WRITE_RUN = "WRITE_RUN",
+    READ_FOLDER = "READ_FOLDER",
+    WRITE_FOLDER = "WRITE_FOLDER",
+    WRITE_ALERT = "WRITE_ALERT",
+    READ_ALERT = "READ_ALERT",
+    READ_MCP = "READ_MCP",
+    WRITE_MCP = "WRITE_MCP",
+    WRITE_PROJECT = "WRITE_PROJECT",
+    READ_PROJECT = "READ_PROJECT",
+    READ_TABLE = "READ_TABLE",
+    WRITE_TABLE = "WRITE_TABLE",
+    READ_KNOWLEDGE_BASE = "READ_KNOWLEDGE_BASE",
+    WRITE_KNOWLEDGE_BASE = "WRITE_KNOWLEDGE_BASE",
+    READ_VARIABLE = "READ_VARIABLE",
+    WRITE_VARIABLE = "WRITE_VARIABLE",
+    READ_AGENT = "READ_AGENT",
+    WRITE_AGENT = "WRITE_AGENT",
+    PUBLISH_SENSITIVE_FLOW_ACCESS = "PUBLISH_SENSITIVE_FLOW_ACCESS"
+}
+export declare enum RoleType {
+    DEFAULT = "DEFAULT",
+    CUSTOM = "CUSTOM"
+}
+export declare enum PlatformUsageMetric {
+    CREDITS = "credits",
+    ACTIVE_FLOWS = "active-flows",
+    USERS = "users",
+    PROJECTS = "projects",
+    STORAGE = "storage",
+    EMAILS = "emails",
+    AI_OPS = "ai-ops",
+    SMS = "sms",
+    WHATSAPP = "whatsapp",
+    VOICE_MINUTES = "voice-minutes"
+}
+export declare const SAFE_STRING_PATTERN = "^[^./]+$";
+export declare const STEP_NAME_REGEX: RegExp;
+export declare enum AIProviderName {
+    OPENAI = "openai",
+    OPENROUTER = "openrouter",
+    ANTHROPIC = "anthropic",
+    AZURE = "azure",
+    GOOGLE = "google",
+    ACTIVEPIECES = "activepieces",
+    CLOUDFLARE_GATEWAY = "cloudflare-gateway",
+    CUSTOM = "custom",
+    BEDROCK = "bedrock",
+    VERTEX = "vertex",
+    MISTRAL = "mistral",
+    XAI = "xai",
+    DEEPSEEK = "deepseek",
+    ZAI = "zai",
+    QWEN = "qwen",
+    MINIMAX = "minimax",
+    MOONSHOT = "moonshot"
+}

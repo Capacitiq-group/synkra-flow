@@ -33,13 +33,13 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
   },
   {
     name: '@synkra/piece-yoco',
-    version: '0.1.1',
-    file: 'synkra-piece-yoco-0.1.1.tgz',
+    version: '0.2.0',
+    file: 'synkra-piece-yoco-0.2.0.tgz',
   },
   {
     name: '@synkra/piece-ikhokha',
-    version: '0.1.1',
-    file: 'synkra-piece-ikhokha-0.1.1.tgz',
+    version: '0.2.0',
+    file: 'synkra-piece-ikhokha-0.2.0.tgz',
   },
   {
     name: '@synkra/piece-courier-guy',
@@ -48,8 +48,8 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
   },
   {
     name: '@synkra/piece-bob-go',
-    version: '0.1.0',
-    file: 'synkra-piece-bob-go-0.1.0.tgz',
+    version: '0.2.0',
+    file: 'synkra-piece-bob-go-0.2.0.tgz',
   },
   {
     name: '@synkra/piece-uber-direct',
@@ -68,13 +68,13 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
   },
   {
     name: '@synkra/piece-snapscan',
-    version: '0.1.0',
-    file: 'synkra-piece-snapscan-0.1.0.tgz',
+    version: '0.2.0',
+    file: 'synkra-piece-snapscan-0.2.0.tgz',
   },
   {
     name: '@synkra/piece-peach-payments',
-    version: '0.1.0',
-    file: 'synkra-piece-peach-payments-0.1.0.tgz',
+    version: '0.2.0',
+    file: 'synkra-piece-peach-payments-0.2.0.tgz',
   },
   {
     name: '@synkra/piece-paygate',
@@ -82,14 +82,14 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
     file: 'synkra-piece-paygate-0.1.0.tgz',
   },
   {
-    name: '@synkra/piece-takealot',
-    version: '0.1.0',
-    file: 'synkra-piece-takealot-0.1.0.tgz',
+    name: '@synkra/piece-bulksms',
+    version: '0.2.0',
+    file: 'synkra-piece-bulksms-0.2.0.tgz',
   },
   {
-    name: '@synkra/piece-drop',
+    name: '@synkra/piece-droppa',
     version: '0.1.0',
-    file: 'synkra-piece-drop-0.1.0.tgz',
+    file: 'synkra-piece-droppa-0.1.0.tgz',
   },
 ];
 
