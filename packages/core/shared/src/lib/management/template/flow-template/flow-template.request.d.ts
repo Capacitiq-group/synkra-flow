@@ -1,5 +1,0 @@
-import { z } from 'zod';
-export declare const GetFlowTemplateRequestQuery: z.ZodObject<{
-    versionId: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>;
-export type GetFlowTemplateRequestQuery = z.infer<typeof GetFlowTemplateRequestQuery>;

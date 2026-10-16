@@ -1,5 +1,0 @@
-import { FlowTrigger } from '../triggers/trigger';
-export declare const flowPieceUtil: {
-    getExactVersion(pieceVersion: string): string;
-    getUsedPieces(trigger: FlowTrigger): string[];
-};

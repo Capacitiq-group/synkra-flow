@@ -107,3 +107,11 @@ deploy/terraform/**/*.tfstate.backup
 deploy/terraform/**/.terraform.lock.hcl
 deploy/terraform/**/terraform.tfvars
 deploy/terraform/**/terraform-*.tfvars
+
+# Build artifacts must never sit next to TypeScript sources
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.js.map
+packages/*/*/src/**/*.js
+packages/*/*/src/**/*.d.ts
+packages/*/*/src/**/*.js.map

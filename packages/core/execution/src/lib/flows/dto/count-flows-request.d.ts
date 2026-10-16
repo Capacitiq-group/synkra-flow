@@ -1,6 +1,0 @@
-import { z } from 'zod';
-export declare const CountFlowsRequest: z.ZodObject<{
-    projectId: z.ZodString;
-    folderId: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>;
-export type CountFlowsRequest = z.infer<typeof CountFlowsRequest>;

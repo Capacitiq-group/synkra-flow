@@ -1,7 +1,0 @@
-import { z } from 'zod';
-export declare const CreateMCPServerFromStepParams: z.ZodObject<{
-    flowId: z.ZodString;
-    flowVersionId: z.ZodString;
-    stepName: z.ZodString;
-}, z.core.$strip>;
-export type CreateMCPServerFromStepParams = z.infer<typeof CreateMCPServerFromStepParams>;
