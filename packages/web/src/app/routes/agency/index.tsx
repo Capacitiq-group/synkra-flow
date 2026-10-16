@@ -28,6 +28,7 @@ import {
 } from '@/features/synkra-agency';
 import { BrandingCard } from './branding-card';
 import { InvoicesTab } from './invoices-tab';
+import { AgencyOnboardingCard } from './onboarding-card';
 
 const TIER_LABELS: Record<AgencyTier, string> = {
   agency_20: 'Agency 20',
@@ -160,6 +161,7 @@ export function AgencyPage() {
             )}
           </div>
         </div>
+        <AgencyOnboardingCard />
 
         {/* Draft banner */}
         {isDraft && (
