@@ -12,12 +12,13 @@ export function useCreditsState() {
   const [streamCreditsExhausted, setStreamCreditsExhausted] = useState(false);
   const [warningDismissed, setWarningDismissed] = useState(false);
 
-  const creditsExhausted =
-    streamCreditsExhausted ||
-    hasExhaustedCredits({
-      usage: platform?.usage,
-      billingEnforced: platform?.billingEnforced,
-    });
+  // [SYNKRA] AP-native credit exhaustion is disabled — Synkra's own
+  // ai_execution_guard enforces quotas server-side against
+  // synkra_subscription.aiOpsUsed. The AP creditsRemaining counter is
+  // never written by Synkra billing, so reading it here produced a
+  // permanent false "credits limit reached" banner. Real exhaustion
+  // surfaces from the stream (streamCreditsExhausted) or the server.
+  const creditsExhausted = streamCreditsExhausted;
 
   const creditsPercentUsed = computeCreditsPercentUsed(platform?.usage);
   const showLowCreditsWarning =

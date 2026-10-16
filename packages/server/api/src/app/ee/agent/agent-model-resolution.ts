@@ -39,9 +39,15 @@ function manualTextModelCatalog({ config }: { config?: AiProviderCredentials['co
 }
 
 function pickAllowedModel({ provider, selectedModel, candidates, modelScope, modelIds }: { provider: AIProviderName, selectedModel: string | null, candidates: string[], modelScope?: AiProviderModelScope, modelIds?: string[] }): string {
-    const allowed = modelScope === 'selected' && !isNil(modelIds)
+    let allowed = modelScope === 'selected' && !isNil(modelIds)
         ? candidates.filter((candidate) => modelIds.includes(candidate))
         : candidates
+    // [SYNKRA] If AP's built-in registry has no models for this provider
+    // (e.g. DeepSeek is seeded by Synkra, not shipped by AP), fall back
+    // to whatever the provider key explicitly allows via modelIds.
+    if (allowed.length === 0 && !isNil(modelIds) && modelIds.length > 0) {
+        allowed = modelIds
+    }
     if (allowed.length === 0) {
         throw new ActivepiecesError({
             code: ErrorCode.ENTITY_NOT_FOUND,

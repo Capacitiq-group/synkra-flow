@@ -82,7 +82,16 @@ export const synkraAiSeed = (log: FastifyBaseLogger) => ({
       config: config as never,
       enabledForChat: true,
       modelScope: 'all',
-      modelIds: [model],
+      // [SYNKRA] Seed every DeepSeek model so chat-tier resolution
+      // (deepseek-flash / deepseek-chat / deepseek-reasoner) always
+      // has a match. AP's built-in registry doesn't ship DeepSeek, so
+      // pickAllowedModel relies on this list as the fallback.
+      modelIds: Array.from(new Set([
+        model,
+        'deepseek-chat',
+        'deepseek-flash',
+        'deepseek-reasoner',
+      ])),
       projectScope: 'all',
       projectIds: [],
       status: 'active',
