@@ -2849,6 +2849,19 @@
         "vitest": "3.2.6",
       },
     },
+    "packages/pieces/community/droppa": {
+      "name": "@synkra/piece-droppa",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/drupal": {
       "name": "@activepieces/piece-drupal",
       "version": "1.1.11",
@@ -14563,6 +14576,8 @@
     "@synkra/piece-courier-guy": ["@synkra/piece-courier-guy@workspace:packages/pieces/community/courier-guy"],
 
     "@synkra/piece-drop": ["@synkra/piece-drop@workspace:packages/pieces/community/drop"],
+
+    "@synkra/piece-droppa": ["@synkra/piece-droppa@workspace:packages/pieces/community/droppa"],
 
     "@synkra/piece-ikhokha": ["@synkra/piece-ikhokha@workspace:packages/pieces/community/ikhokha"],
 
