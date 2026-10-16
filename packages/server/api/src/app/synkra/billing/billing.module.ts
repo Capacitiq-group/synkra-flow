@@ -13,16 +13,26 @@ import { synkraOnboardingController } from '../onboarding/onboarding.controller'
 import { synkraAgencyController } from '../agency/agency.controller';
 import { synkraAgencyPortalController } from '../agency/portal.controller';
 import { synkraAgencyInvoiceController } from '../agency/invoice.controller';
+import { synkraAgencyOnboardingController } from '../agency/agency-onboarding.controller';
 import { synkraAgencyBillingCron } from '../agency/billing-cron.service';
 import { synkraAgencyWebhookController } from '../agency/agency-webhook.controller';
 import { synkraDashboardController } from '../dashboard/dashboard.controller';
 import { synkraCreditsController } from '../credits/credits.controller';
 import { synkraBetaController } from '../beta/beta.controller';
+import { synkraApiKeysController } from '../api-keys/synkra-api-keys.controller';
+import { synkraWebhooksController } from '../webhooks/synkra-webhooks.controller';
+import { synkraAiSeed } from '../ai/synkra-ai-seed.service';
+import { synkraByokController } from '../ai/synkra-byok.controller';
+import { synkraPublicApiController } from '../public-api/public-api.controller';
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
 export const synkraBillingModule: FastifyPluginAsyncZod = async (app) => {
   synkraBootSeed(app.log).verifyBillingConfig();
+  // Seed Synkra-wide AI provider (DeepSeek) so chat works on paid tiers.
+  synkraAiSeed(app.log).ensureAll().catch((err) => {
+    app.log.error({ err }, 'synkra ai seed failed at boot');
+  });
 
   // Seed OAuth apps from env (idempotent, safe on every boot).
   synkraOauthSeed(app.log).seedAll().catch((err) => {
@@ -76,11 +86,16 @@ export const synkraBillingModule: FastifyPluginAsyncZod = async (app) => {
   await app.register(synkraDashboardController, { prefix: '/v1/synkra/dashboard' });
   await app.register(synkraCreditsController, { prefix: '/v1/synkra/credits' });
   await app.register(synkraBetaController, { prefix: '/v1/synkra/beta' });
+  await app.register(synkraApiKeysController, { prefix: '/v1/synkra/api-keys' });
+  await app.register(synkraWebhooksController, { prefix: '/v1/synkra/webhooks' });
+  await app.register(synkraPublicApiController, { prefix: '/v1/synkra/public' });
   await app.register(synkraHealthController, { prefix: '/v1/synkra/health' });
   await app.register(synkraPreflightController, { prefix: '/v1/synkra/preflight' });
   await app.register(synkraAiBalanceController, { prefix: '/v1/synkra/ai' });
+  await app.register(synkraByokController, { prefix: '/v1/synkra/ai' });
   await app.register(synkraOnboardingController, { prefix: '/v1/synkra/onboarding' });
   await app.register(synkraAgencyController, { prefix: '/v1/synkra/agency' });
   await app.register(synkraAgencyPortalController, { prefix: '/v1/synkra/agency' });
   await app.register(synkraAgencyInvoiceController, { prefix: '/v1/synkra/agency' });
+  await app.register(synkraAgencyOnboardingController, { prefix: '/v1/synkra/agency' });
 };

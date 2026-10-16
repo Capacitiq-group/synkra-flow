@@ -23,6 +23,7 @@ import {
   SquarePen,
   UserCogIcon,
   Building2,
+  Code2,
   CreditCard,
   LayoutDashboard,
   Plug,
@@ -196,6 +197,13 @@ export function PrimaryRail() {
             icon={CreditCard}
             label={t('Billing')}
             isActive={({ pathname }) => pathname.startsWith('/billing')}
+          />
+          <RailNavButton
+            collapsed={collapsed}
+            to="/developer"
+            icon={Code2}
+            label={t('Developer')}
+            isActive={({ pathname }) => pathname.startsWith('/developer')}
           />
           <RailNavButton
             collapsed={collapsed}

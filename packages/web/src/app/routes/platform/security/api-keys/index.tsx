@@ -43,7 +43,7 @@ const ApiKeysPage = () => {
   return (
     <CenteredPage
       title={t('API Keys')}
-      description={t('Manage API keys to access Activepieces APIs.')}
+      description={t('Manage API keys to access the Synkra Flow public API.')}
       actions={
         <NewApiKeyDialog onCreate={() => refetch()}>
           <AnimatedIconButton

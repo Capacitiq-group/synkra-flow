@@ -50,9 +50,9 @@ export const SYNKRA_PLANS: Record<SynkraTier, SynkraPlanLimits> = {
     seats: 3, workspaces: 1, executions: 15000,
     activeWorkflows: 25, draftWorkflows: 50, maxWorkflowSteps: 25,
     storageGb: 10, emails: 2000, aiOps: 1000, sms: 0, whatsapp: 0, voiceMinutes: 0,
-    integrations: true, sso: false, apiKeys: false, customDomain: false,
+    integrations: true, sso: false, apiKeys: true, customDomain: false,
     auditLogs: false, auditRetentionDays: 0, whiteLabel: false,
-    apiKeysLimit: 0, customRolesLimit: 0, ssoDomainLimit: 0,
+    apiKeysLimit: 5, customRolesLimit: 0, ssoDomainLimit: 0,
     studentDiscountZar: 50, communityDiscountZar: 50,
   },
   business: {

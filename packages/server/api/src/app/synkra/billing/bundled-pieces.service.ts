@@ -61,6 +61,36 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
     version: '0.1.0',
     file: 'synkra-piece-pargo-0.1.0.tgz',
   },
+  {
+    name: '@synkra/piece-ozow',
+    version: '0.1.0',
+    file: 'synkra-piece-ozow-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-snapscan',
+    version: '0.1.0',
+    file: 'synkra-piece-snapscan-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-peach-payments',
+    version: '0.1.0',
+    file: 'synkra-piece-peach-payments-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-paygate',
+    version: '0.1.0',
+    file: 'synkra-piece-paygate-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-takealot',
+    version: '0.1.0',
+    file: 'synkra-piece-takealot-0.1.0.tgz',
+  },
+  {
+    name: '@synkra/piece-drop',
+    version: '0.1.0',
+    file: 'synkra-piece-drop-0.1.0.tgz',
+  },
 ];
 
 /**

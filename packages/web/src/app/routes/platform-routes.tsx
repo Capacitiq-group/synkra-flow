@@ -106,6 +106,10 @@ const WORKERS_TAB_PATHS = { health: '', 'worker-groups': 'groups' };
 const AI_TAB_PATHS = { providers: '', capabilities: 'capabilities' };
 const PIECES_TAB_PATHS = { pieces: '', 'piece-sets': 'piece-sets' };
 
+const BetaAdminPage = React.lazy(() =>
+  import('./platform/beta').then((m) => ({ default: m.default })),
+);
+
 export const platformRoutes = [
   {
     path: '/platform',
@@ -113,6 +117,18 @@ export const platformRoutes = [
       <PlatformLayout>
         <PageTitle title="Platform">
           <Navigate to="/platform/projects" />
+        </PageTitle>
+      </PlatformLayout>
+    ),
+  },
+  {
+    path: '/platform/beta',
+    element: (
+      <PlatformLayout>
+        <PageTitle title="Beta">
+          <SuspenseWrapper>
+            <BetaAdminPage />
+          </SuspenseWrapper>
         </PageTitle>
       </PlatformLayout>
     ),

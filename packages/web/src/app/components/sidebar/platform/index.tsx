@@ -99,6 +99,11 @@ export function PlatformSidebar() {
           label: t('Preflight'),
           icon: FileHeartIcon,
         },
+        {
+          to: '/platform/beta',
+          label: t('Beta Applications'),
+          icon: UsersIcon,
+        },
       ],
     },
     {

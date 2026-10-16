@@ -9,6 +9,7 @@ import { FastifyBaseLogger } from 'fastify'
 import { Repository } from 'typeorm'
 import { z } from 'zod'
 import { aiModelCandidates } from '../../ai/ai-model-candidates'
+import { synkraAiExecutionGuard } from '../../synkra/ai/synkra-ai-execution-guard'
 import { aiProviderService, ProviderScope } from '../../ai/ai-provider-service'
 import { repoFactory } from '../../core/db/repo-factory'
 import { transaction } from '../../core/db/transaction'
@@ -127,6 +128,14 @@ async function resolveChatProvider({ platformId, scope, log }: { platformId: str
             params: { entityId: platformId, entityType: AI_PROVIDER_ENTITY_TYPES.chatProvider },
         }, 'no AI provider on this platform is enabled for chat')
     }
+    // Synkra execution guard — blocks credit-consuming chat on tiers
+    // without allowance (Free). BYOK providers are skipped because they
+    // do not consume Flow credits.
+    await synkraAiExecutionGuard(log).assertAllowedIfManaged({
+        platformId,
+        source: 'chat',
+        provider: chatProvider.provider,
+    })
     return chatProvider
 }
 

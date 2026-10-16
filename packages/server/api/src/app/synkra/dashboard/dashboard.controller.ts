@@ -112,11 +112,15 @@ export const synkraDashboardController: FastifyPluginAsyncZod = async (app) => {
       try {
         const { appConnectionsRepo } = await import('../../app-connection/app-connection-service/app-connection-service');
         const { AppConnectionStatus } = await import('@activepieces/shared');
+        // Exclude internal Synkra pieces (chat widget, etc.) from the user-facing count.
         connectedIntegrations = await appConnectionsRepo()
           .createQueryBuilder('ac')
-          .innerJoin('project', 'p', 'p.id = ac."projectId"')
+          .innerJoin('project', 'p', 'p.id = ANY(ac."projectIds")')
           .where('p."platformId" = :platformId', { platformId })
           .andWhere('ac.status = :status', { status: AppConnectionStatus.ACTIVE })
+          .andWhere('ac."pieceName" NOT LIKE :internalPrefix', {
+            internalPrefix: '@synkra/%',
+          })
           .getCount();
       } catch (err) {
         request.log.warn({ err }, 'dashboard: connections query failed');

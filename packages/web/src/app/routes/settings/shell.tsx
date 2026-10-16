@@ -54,7 +54,7 @@ const SECTIONS: Section[] = [
     id: 'security',
     label: t('Security'),
     icon: KeyRound,
-    description: t('Password, sessions, two-factor, and API access.'),
+    description: t('Password, sessions, and two-factor authentication.'),
   },
 ];
 

@@ -1455,6 +1455,19 @@
         "tslib": "2.6.2",
       },
     },
+    "packages/pieces/community/bulksms": {
+      "name": "@activepieces/piece-bulksms",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/bumpups": {
       "name": "@activepieces/piece-bumpups",
       "version": "0.2.0",
@@ -2806,6 +2819,19 @@
       "devDependencies": {
         "tslib": "2.6.2",
         "vitest": "3.2.6",
+      },
+    },
+    "packages/pieces/community/drop": {
+      "name": "@synkra/piece-drop",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
       },
     },
     "packages/pieces/community/dropbox": {
@@ -6356,6 +6382,19 @@
         "tslib": "2.6.2",
       },
     },
+    "packages/pieces/community/netcash": {
+      "name": "@activepieces/piece-netcash",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/netlify": {
       "name": "@activepieces/piece-netlify",
       "version": "0.1.7",
@@ -6776,6 +6815,19 @@
         "tslib": "2.6.2",
       },
     },
+    "packages/pieces/community/ozow": {
+      "name": "@synkra/piece-ozow",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/paddle": {
       "name": "@activepieces/piece-paddle",
       "version": "0.1.0",
@@ -6922,6 +6974,19 @@
         "tslib": "2.6.2",
       },
     },
+    "packages/pieces/community/paygate": {
+      "name": "@synkra/piece-paygate",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/paywhirl": {
       "name": "@activepieces/piece-paywhirl",
       "version": "0.1.0",
@@ -6989,6 +7054,19 @@
       },
       "devDependencies": {
         "tslib": "^2.3.0",
+      },
+    },
+    "packages/pieces/community/peach-payments": {
+      "name": "@synkra/piece-peach-payments",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
       },
     },
     "packages/pieces/community/peekshot": {
@@ -8671,6 +8749,19 @@
         "tslib": "^2.3.0",
       },
     },
+    "packages/pieces/community/snapscan": {
+      "name": "@synkra/piece-snapscan",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
+      },
+    },
     "packages/pieces/community/snowflake": {
       "name": "@activepieces/piece-snowflake",
       "version": "0.3.6",
@@ -9005,6 +9096,19 @@
       },
       "devDependencies": {
         "tslib": "^2.3.0",
+      },
+    },
+    "packages/pieces/community/takealot": {
+      "name": "@synkra/piece-takealot",
+      "version": "0.1.0",
+      "dependencies": {
+        "@activepieces/core-piece-types": "workspace:*",
+        "@activepieces/core-utils": "workspace:*",
+        "@activepieces/pieces-common": "workspace:*",
+        "@activepieces/pieces-framework": "workspace:*",
+      },
+      "devDependencies": {
+        "tslib": "2.6.2",
       },
     },
     "packages/pieces/community/talkable": {
@@ -11558,6 +11662,8 @@
 
     "@activepieces/piece-buffer": ["@activepieces/piece-buffer@workspace:packages/pieces/community/buffer"],
 
+    "@activepieces/piece-bulksms": ["@activepieces/piece-bulksms@workspace:packages/pieces/community/bulksms"],
+
     "@activepieces/piece-bumpups": ["@activepieces/piece-bumpups@workspace:packages/pieces/community/bumpups"],
 
     "@activepieces/piece-bursty-ai": ["@activepieces/piece-bursty-ai@workspace:packages/pieces/community/bursty-ai"],
@@ -12287,6 +12393,8 @@
     "@activepieces/piece-mysendingbox": ["@activepieces/piece-mysendingbox@workspace:packages/pieces/community/mysendingbox"],
 
     "@activepieces/piece-mysql": ["@activepieces/piece-mysql@workspace:packages/pieces/community/mysql"],
+
+    "@activepieces/piece-netcash": ["@activepieces/piece-netcash@workspace:packages/pieces/community/netcash"],
 
     "@activepieces/piece-netlify": ["@activepieces/piece-netlify@workspace:packages/pieces/community/netlify"],
 
@@ -14468,13 +14576,25 @@
 
     "@synkra/piece-courier-guy": ["@synkra/piece-courier-guy@workspace:packages/pieces/community/courier-guy"],
 
+    "@synkra/piece-drop": ["@synkra/piece-drop@workspace:packages/pieces/community/drop"],
+
     "@synkra/piece-ikhokha": ["@synkra/piece-ikhokha@workspace:packages/pieces/community/ikhokha"],
+
+    "@synkra/piece-ozow": ["@synkra/piece-ozow@workspace:packages/pieces/community/ozow"],
 
     "@synkra/piece-pargo": ["@synkra/piece-pargo@workspace:packages/pieces/community/pargo"],
 
     "@synkra/piece-payfast": ["@synkra/piece-payfast@workspace:packages/pieces/community/payfast"],
 
+    "@synkra/piece-paygate": ["@synkra/piece-paygate@workspace:packages/pieces/community/paygate"],
+
+    "@synkra/piece-peach-payments": ["@synkra/piece-peach-payments@workspace:packages/pieces/community/peach-payments"],
+
+    "@synkra/piece-snapscan": ["@synkra/piece-snapscan@workspace:packages/pieces/community/snapscan"],
+
     "@synkra/piece-synkra-chat": ["@synkra/piece-synkra-chat@workspace:packages/pieces/community/synkra-chat"],
+
+    "@synkra/piece-takealot": ["@synkra/piece-takealot@workspace:packages/pieces/community/takealot"],
 
     "@synkra/piece-uber-direct": ["@synkra/piece-uber-direct@workspace:packages/pieces/community/uber-direct"],
 
