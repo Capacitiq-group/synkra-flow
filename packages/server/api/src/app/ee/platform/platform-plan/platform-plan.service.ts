@@ -276,6 +276,10 @@ async function createInitialBilling(platformId: string): Promise<PlatformPlan> {
         ...plan,
         id: apId(),
         platformId,
+        // Synkra overrides (Session C): never show "Powered by Activepieces",
+        // always enable Tables for new platforms.
+        showPoweredBy: false,
+        tablesEnabled: true,
     }
     const savedPlatformPlan = await platformPlanRepo().save(platformPlan)
     if (!isNil(savedPlatformPlan.plan)) {
