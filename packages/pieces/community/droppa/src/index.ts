@@ -37,7 +37,7 @@ export const droppa = createPiece({
   auth: droppaAuth,
   minimumSupportedRelease: '0.0.0',
   logoUrl:
-    'https://res.cloudinary.com/dewvhnks3/image/upload/v1791963600/droppa-placeholder.png',
+    'https://res.cloudinary.com/dewvhnks3/image/upload/b_white/v1792157839/Droppa_icon_o8kc1r.svg',
   categories: [PieceCategory.COMMERCE],
   authors: ['Synkra'],
   actions: [getSamedayQuote, createBooking, getBooking, cancelBooking],
