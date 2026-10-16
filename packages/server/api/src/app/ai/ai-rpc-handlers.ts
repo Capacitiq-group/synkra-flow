@@ -12,6 +12,7 @@ import { resumeService } from '../waitpoints/resume-service'
 import { aiModelCandidates } from './ai-model-candidates'
 import { aiProviderService } from './ai-provider-service'
 import { aiUsageService } from './ai-usage-service'
+import { synkraAiExecutionGuard } from '../synkra/ai/synkra-ai-execution-guard'
 
 export const aiRpcHandlers = (log: FastifyBaseLogger) => ({
     async resolveAiProvider(input: ResolveAiProviderRequest): Promise<ResolveAiProviderResponse> {
@@ -21,6 +22,14 @@ export const aiRpcHandlers = (log: FastifyBaseLogger) => ({
             provider: input.provider,
             scope: { type: 'project', projectId: input.projectId },
             ...spreadIfDefined('configId', input.providerConfigId),
+        })
+        // Synkra execution guard — blocks credit-consuming AI ops when
+        // the caller has no allowance. BYOK providers are skipped because
+        // they do not consume Flow credits.
+        await synkraAiExecutionGuard(log).assertAllowedIfManaged({
+            platformId: input.platformId,
+            source: 'workflow',
+            provider: config.provider,
         })
         if (!isNil(input.modelId)) {
             aiProviderService(log).assertKeyAllowsModel({ key: config, modelId: input.modelId })

@@ -23,7 +23,7 @@ export function DeveloperOverviewPage() {
           body={t(
             'Generate keys for programmatic access to your workspace. Read-only today; flow triggers coming soon.',
           )}
-          linkTo="../api"
+          linkTo="api"
           linkLabel={t('Manage API keys')}
         />
         <Card
@@ -32,7 +32,7 @@ export function DeveloperOverviewPage() {
           body={t(
             'Receive notifications when flows run, fail, or complete.',
           )}
-          linkTo="../webhooks"
+          linkTo="webhooks"
           linkLabel={t('Coming soon')}
           disabled
         />
@@ -42,7 +42,7 @@ export function DeveloperOverviewPage() {
           body={t(
             'Register OAuth applications to integrate external services with Synkra.',
           )}
-          linkTo="../applications"
+          linkTo="applications"
           linkLabel={t('Coming soon')}
           disabled
         />
@@ -52,7 +52,7 @@ export function DeveloperOverviewPage() {
           body={t(
             'API request logs, error responses, and webhook delivery history.',
           )}
-          linkTo="../activity"
+          linkTo="activity"
           linkLabel={t('Coming soon')}
           disabled
         />
@@ -108,6 +108,7 @@ function Card({
       ) : (
         <Link
           to={linkTo}
+          relative="path"
           className="text-sm font-medium text-accent-11 hover:underline"
         >
           {linkLabel}

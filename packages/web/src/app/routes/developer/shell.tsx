@@ -3,7 +3,6 @@ import {
   Activity,
   AppWindow,
   BookOpen,
-  BookText,
   Code2,
   FlaskConical,
   GitBranch,
@@ -24,7 +23,6 @@ export type DeveloperSectionId =
   | 'overview'
   | 'quickstart'
   | 'api'
-  | 'api-reference'
   | 'playground'
   | 'webhooks'
   | 'applications'
@@ -56,12 +54,6 @@ const SECTIONS: {
     label: 'API Keys',
     icon: KeyRound,
     description: 'Manage keys for programmatic access to Synkra Flow.',
-  },
-  {
-    id: 'api-reference',
-    label: 'API Reference',
-    icon: BookText,
-    description: 'Endpoints, authentication, and response shapes.',
   },
   {
     id: 'playground',
@@ -161,7 +153,10 @@ export function DeveloperShell({
               href={DOCS_LINK.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 flex items-center gap-2 rounded-md border-t border-gray-4 px-3 pt-3 py-2 text-sm text-gray-11 transition-colors hover:bg-gray-3 hover:text-gray-12"
+              className={cn(
+                'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+                'text-gray-11 hover:bg-gray-3 hover:text-gray-12',
+              )}
             >
               <DOCS_LINK.icon className="h-4 w-4" />
               {DOCS_LINK.label}

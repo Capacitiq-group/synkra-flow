@@ -12,7 +12,9 @@ import { flowRunService } from '../../flows/flow-run/flow-run-service';
 import { projectRepo } from '../../project/project-repo';
 import { platformService } from '../../platform/platform.service';
 import { appConnectionService } from '../../app-connection/app-connection-service/app-connection-service';
-import { AppConnectionStatus, FlowRunStatus, RunEnvironment } from '@activepieces/shared';
+import { AppConnectionStatus, FlowStatus, FlowRunStatus, RunEnvironment } from '@activepieces/shared';
+import { flowService } from '../../flows/flow/flow.service';
+import { eventDestinationService } from '../../event-destinations/event-destinations.service';
 import { synkraSubscriptionService } from '../billing/subscription.service';
 import { synkraUsageService } from '../billing/usage.service';
 
@@ -434,7 +436,7 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
       const page = await appConnectionService(request.log).list({
         projectId: null,
         projectIds: undefined,
-        ownerIds: [],
+        ownerIds: undefined,
         pieceName: undefined,
         cursorRequest: null,
         displayName: undefined,
@@ -442,10 +444,14 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
         limit: 200,
         scope: undefined,
         platformId,
-        externalIds: [],
+        externalIds: undefined,
       });
+      // Filter out internal Synkra pieces (chat widget etc.) from user-facing list
+      const userConnections = page.data.filter(
+        (c) => !c.pieceName.startsWith('@synkra/'),
+      );
       return {
-        connections: page.data.map((c) => ({
+        connections: userConnections.map((c) => ({
           id: c.id,
           displayName: c.displayName,
           pieceName: c.pieceName,
@@ -485,7 +491,7 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
       const page = await appConnectionService(request.log).list({
         projectId: null,
         projectIds: undefined,
-        ownerIds: [],
+        ownerIds: undefined,
         pieceName: undefined,
         cursorRequest: null,
         displayName: undefined,
@@ -493,7 +499,7 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
         limit: 200,
         scope: undefined,
         platformId,
-        externalIds: [],
+        externalIds: undefined,
       });
       const match = page.data.find((c) => c.id === request.params.id);
       if (!match) {
@@ -506,6 +512,491 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
         projectId: null,
       } as never);
       return { ok: true };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // GET /flows/:id — single flow detail
+  // ────────────────────────────────────────────────────────────
+  app.get(
+    '/flows/:id',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        response: {
+          200: z.object({
+            id: z.string(),
+            displayName: z.string(),
+            status: z.string(),
+            projectId: z.string(),
+            publishedVersionId: z.string().nullable(),
+            created: z.string(),
+            updated: z.string(),
+          }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'GET /flows/:id');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const flow = await flowRepo().findOneBy({ id: request.params.id });
+      if (!flow) {
+        return reply.status(404).send({ error: 'Flow not found.' });
+      }
+      const project = await projectRepo().findOneBy({ id: flow.projectId });
+      if (!project || project.platformId !== platformId) {
+        return reply.status(403).send({ error: 'Forbidden.' });
+      }
+      return {
+        id: flow.id,
+        displayName: (flow as { displayName?: string }).displayName ?? 'Untitled',
+        status: flow.status,
+        projectId: flow.projectId,
+        publishedVersionId: flow.publishedVersionId ?? null,
+        created: new Date(flow.created).toISOString(),
+        updated: new Date(flow.updated).toISOString(),
+      };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // PATCH /flows/:id — rename a flow
+  // ────────────────────────────────────────────────────────────
+  app.patch(
+    '/flows/:id',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z.object({
+          displayName: z.string().min(1).max(200).optional(),
+        }),
+        response: {
+          200: z.object({
+            id: z.string(),
+            displayName: z.string(),
+          }),
+          400: z.object({ error: z.string() }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'PATCH /flows/:id');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const flow = await flowRepo().findOneBy({ id: request.params.id });
+      if (!flow) {
+        return reply.status(404).send({ error: 'Flow not found.' });
+      }
+      const project = await projectRepo().findOneBy({ id: flow.projectId });
+      if (!project || project.platformId !== platformId) {
+        return reply.status(403).send({ error: 'Forbidden.' });
+      }
+      if (!request.body.displayName) {
+        return reply.status(400).send({ error: 'Nothing to update.' });
+      }
+      await flowRepo().update(
+        { id: flow.id },
+        { displayName: request.body.displayName } as never,
+      );
+      return {
+        id: flow.id,
+        displayName: request.body.displayName,
+      };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // POST /flows/:id/enable
+  // ────────────────────────────────────────────────────────────
+  app.post(
+    '/flows/:id/enable',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        response: {
+          200: z.object({ ok: z.boolean(), status: z.string() }),
+          400: z.object({ error: z.string() }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+          500: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'POST /flows/:id/enable');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const flow = await flowRepo().findOneBy({ id: request.params.id });
+      if (!flow) {
+        return reply.status(404).send({ error: 'Flow not found.' });
+      }
+      const project = await projectRepo().findOneBy({ id: flow.projectId });
+      if (!project || project.platformId !== platformId) {
+        return reply.status(403).send({ error: 'Forbidden.' });
+      }
+      if (!flow.publishedVersionId) {
+        return reply
+          .status(400)
+          .send({ error: 'Flow has no published version.' });
+      }
+      try {
+        await flowService(request.log).applyStatusChangeForPublishedFlow({
+          id: flow.id,
+          projectId: flow.projectId,
+          newStatus: FlowStatus.ENABLED,
+        });
+        return { ok: true, status: FlowStatus.ENABLED };
+      } catch (err) {
+        request.log.error({ err }, '[public-api] enable flow failed');
+        return reply
+          .status(500)
+          .send({ error: 'Failed to enable flow.' } as never);
+      }
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // POST /flows/:id/disable
+  // ────────────────────────────────────────────────────────────
+  app.post(
+    '/flows/:id/disable',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        response: {
+          200: z.object({ ok: z.boolean(), status: z.string() }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+          500: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'POST /flows/:id/disable');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const flow = await flowRepo().findOneBy({ id: request.params.id });
+      if (!flow) {
+        return reply.status(404).send({ error: 'Flow not found.' });
+      }
+      const project = await projectRepo().findOneBy({ id: flow.projectId });
+      if (!project || project.platformId !== platformId) {
+        return reply.status(403).send({ error: 'Forbidden.' });
+      }
+      try {
+        await flowService(request.log).applyStatusChangeForPublishedFlow({
+          id: flow.id,
+          projectId: flow.projectId,
+          newStatus: FlowStatus.DISABLED,
+        });
+        return { ok: true, status: FlowStatus.DISABLED };
+      } catch (err) {
+        request.log.error({ err }, '[public-api] disable flow failed');
+        return reply
+          .status(500)
+          .send({ error: 'Failed to disable flow.' } as never);
+      }
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // GET /connections/:id — single connection
+  // ────────────────────────────────────────────────────────────
+  app.get(
+    '/connections/:id',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        response: {
+          200: z.object({
+            id: z.string(),
+            displayName: z.string(),
+            pieceName: z.string(),
+            projectId: z.string().nullable(),
+            status: z.string(),
+            created: z.string(),
+          }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'GET /connections/:id');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const page = await appConnectionService(request.log).list({
+        projectId: null,
+        projectIds: undefined,
+        ownerIds: undefined,
+        pieceName: undefined,
+        cursorRequest: null,
+        displayName: undefined,
+        status: undefined,
+        limit: 200,
+        scope: undefined,
+        platformId,
+        externalIds: undefined,
+      });
+      const match = page.data.find((c) => c.id === request.params.id);
+      if (!match) {
+        return reply.status(404).send({ error: 'Connection not found.' });
+      }
+      return {
+        id: match.id,
+        displayName: match.displayName,
+        pieceName: match.pieceName,
+        projectId: (match.projectIds ?? [])[0] ?? null,
+        status: match.status,
+        created: new Date(match.created).toISOString(),
+      };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // GET /usage/breakdown — daily run counts for last N days
+  // ────────────────────────────────────────────────────────────
+  app.get(
+    '/usage/breakdown',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        querystring: z.object({
+          days: z.coerce.number().min(1).max(90).default(30),
+        }),
+        response: {
+          200: z.object({
+            periodStart: z.string(),
+            periodEnd: z.string(),
+            totalRuns: z.number(),
+            byStatus: z.record(z.string(), z.number()),
+            byDay: z.array(
+              z.object({
+                date: z.string(),
+                count: z.number(),
+              }),
+            ),
+          }),
+          403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'GET /usage/breakdown');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const days = request.query.days;
+      const end = new Date();
+      const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
+
+      const projects = await projectRepo().find({
+        where: { platformId } as never,
+      });
+      const projectIds = projects.map((p) => p.id);
+      if (projectIds.length === 0) {
+        return {
+          periodStart: start.toISOString(),
+          periodEnd: end.toISOString(),
+          totalRuns: 0,
+          byStatus: {},
+          byDay: [],
+        };
+      }
+
+      // Total + by-status
+      const rawByStatus = await flowRunRepo()
+        .createQueryBuilder('r')
+        .select('r.status', 'status')
+        .addSelect('COUNT(*)', 'count')
+        .where('r."projectId" IN (:...projectIds)', { projectIds })
+        .andWhere('r.created >= :start', { start: start.toISOString() })
+        .andWhere('r.created <= :end', { end: end.toISOString() })
+        .groupBy('r.status')
+        .getRawMany<{ status: string; count: string }>();
+
+      const byStatus: Record<string, number> = {};
+      let totalRuns = 0;
+      for (const row of rawByStatus) {
+        const n = parseInt(row.count, 10);
+        byStatus[row.status] = n;
+        totalRuns += n;
+      }
+
+      // By-day
+      const rawByDay = await flowRunRepo()
+        .createQueryBuilder('r')
+        .select("DATE_TRUNC('day', r.created)", 'day')
+        .addSelect('COUNT(*)', 'count')
+        .where('r."projectId" IN (:...projectIds)', { projectIds })
+        .andWhere('r.created >= :start', { start: start.toISOString() })
+        .andWhere('r.created <= :end', { end: end.toISOString() })
+        .groupBy("DATE_TRUNC('day', r.created)")
+        .orderBy("DATE_TRUNC('day', r.created)", 'ASC')
+        .getRawMany<{ day: Date; count: string }>();
+
+      const byDay = rawByDay.map((row) => ({
+        date: new Date(row.day).toISOString().slice(0, 10),
+        count: parseInt(row.count, 10),
+      }));
+
+      return {
+        periodStart: start.toISOString(),
+        periodEnd: end.toISOString(),
+        totalRuns,
+        byStatus,
+        byDay,
+      };
+    },
+  );
+
+  // ────────────────────────────────────────────────────────────
+  // Webhooks — subscribe to flow events
+  // ────────────────────────────────────────────────────────────
+
+  app.get(
+    '/webhooks',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        response: {
+          200: z.object({
+            webhooks: z.array(
+              z.object({
+                id: z.string(),
+                url: z.string(),
+                events: z.array(z.string()),
+                enabled: z.boolean(),
+                created: z.string(),
+              }),
+            ),
+          }),
+          403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'GET /webhooks');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      const page = await eventDestinationService(request.log).list({
+        platformId,
+        cursorRequest: null,
+        limit: 200,
+      });
+      return {
+        webhooks: page.data.map((d) => ({
+          id: d.id,
+          url: d.url,
+          events: d.events as string[],
+          enabled: d.enabled,
+          created: new Date(d.created).toISOString(),
+        })),
+      };
+    },
+  );
+
+  app.post(
+    '/webhooks',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        body: z.object({
+          url: z.string().url(),
+          events: z.array(z.string()).min(1),
+          enabled: z.boolean().optional(),
+        }),
+        response: {
+          200: z.object({
+            id: z.string(),
+            url: z.string(),
+            events: z.array(z.string()),
+            enabled: z.boolean(),
+            created: z.string(),
+          }),
+          400: z.object({ error: z.string() }),
+          403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'POST /webhooks');
+      if (!ctx) return;
+      const { platformId } = ctx;
+      try {
+        const created = await eventDestinationService(request.log).create({
+          platformId,
+          request: {
+            url: request.body.url,
+            events: request.body.events as never,
+            enabled: request.body.enabled,
+          } as never,
+        });
+        return {
+          id: created.id,
+          url: created.url,
+          events: created.events as string[],
+          enabled: created.enabled,
+          created: new Date(created.created).toISOString(),
+        };
+      } catch (err) {
+        request.log.warn({ err }, '[public-api] webhook create failed');
+        return reply.status(400).send({
+          error:
+            (err as Error).message ?? 'Could not create webhook subscription.',
+        });
+      }
+    },
+  );
+
+  app.delete(
+    '/webhooks/:id',
+    {
+      config: { security: securityAccess.unscoped(ALL_PRINCIPAL_TYPES) },
+      schema: {
+        params: z.object({ id: z.string() }),
+        response: {
+          200: z.object({ ok: z.boolean() }),
+          403: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const ctx = await gate(
+        request as never,
+        reply as never,
+        'DELETE /webhooks/:id',
+      );
+      if (!ctx) return;
+      const { platformId } = ctx;
+      try {
+        await eventDestinationService(request.log).delete({
+          id: request.params.id,
+          platformId,
+        });
+        return { ok: true };
+      } catch {
+        return reply.status(404).send({ error: 'Webhook not found.' });
+      }
     },
   );
 
@@ -523,18 +1014,18 @@ export const synkraPublicApiController: FastifyPluginAsyncZod = async (app) => {
             principalType: z.string(),
             platformId: z.string().nullable(),
           }),
+          403: z.object({ error: z.string() }),
+          429: z.object({ error: z.string() }),
         },
       },
     },
-    async (request) => {
-      const principal = request.principal;
-      const pid =
-        (principal as unknown as { platform?: { id: string } }).platform?.id ??
-        null;
+    async (request, reply) => {
+      const ctx = await gate(request as never, reply as never, 'GET /ping');
+      if (!ctx) return;
       return {
         ok: true,
-        principalType: principal.type,
-        platformId: pid,
+        principalType: 'SERVICE',
+        platformId: ctx.platformId,
       };
     },
   );

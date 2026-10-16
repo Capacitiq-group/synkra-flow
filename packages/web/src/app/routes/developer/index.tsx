@@ -1,6 +1,5 @@
 import { DeveloperActivityPage } from './activity';
 import { DeveloperApiPage } from './api';
-import { DeveloperApiReferencePage } from './api-reference';
 import { DeveloperApplicationsPage } from './applications';
 import { DeveloperChangelogPage } from './changelog';
 import { DeveloperOverviewPage } from './overview';
@@ -22,8 +21,6 @@ export function DeveloperPage() {
             return <DeveloperQuickstartPage />;
           case 'api':
             return <DeveloperApiPage />;
-          case 'api-reference':
-            return <DeveloperApiReferencePage />;
           case 'playground':
             return <DeveloperPlaygroundPage />;
           case 'webhooks':
