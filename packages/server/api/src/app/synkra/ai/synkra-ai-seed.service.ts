@@ -91,6 +91,7 @@ export const synkraAiSeed = (log: FastifyBaseLogger) => ({
         'deepseek-chat',
         'deepseek-flash',
         'deepseek-reasoner',
+        'deepseek-v4-pro',
       ])),
       projectScope: 'all',
       projectIds: [],

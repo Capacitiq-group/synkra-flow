@@ -92,6 +92,27 @@ const BUNDLED_PIECES: BundledPieceSpec[] = [
     version: '0.1.0',
     file: 'synkra-piece-droppa-0.1.0.tgz',
   },
+  // --- NON-OAUTH INTEGRATIONS (Sunday Batch) ---
+  {
+    name: '@activepieces/piece-notion',
+    version: '0.1.0', 
+    file: 'synkra-piece-notion-0.1.0.tgz',
+  },
+  {
+    name: '@activepieces/piece-imap',
+    version: '0.1.0',
+    file: 'synkra-piece-imap-0.1.0.tgz',
+  },
+  {
+    name: '@activepieces/piece-discord',
+    version: '0.1.0',
+    file: 'synkra-piece-discord-0.1.0.tgz',
+  },
+  {
+    name: '@activepieces/piece-supabase',
+    version: '0.1.0',
+    file: 'synkra-piece-supabase-0.1.0.tgz',
+  },
 ];
 
 /**

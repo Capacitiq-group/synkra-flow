@@ -116,10 +116,24 @@ function resolveModelIdForProvider({ provider, selectedModel, surface, config, m
     }
     const candidates = aiProviderUtils.runnableChatModelIds({ provider })
     // [SYNKRA] AP's registry doesn't include custom providers like DeepSeek.
-    // If candidates is empty, trust the selectedModel directly instead of
-    // falling through to a null preferred model and throwing in pickAllowedModel.
-    if (candidates.length === 0 && !isNil(selectedModel)) {
-        return selectedModel;
+    if (candidates.length === 0) {
+        let resolved = selectedModel;
+        // Map AP's internal tier names to real DeepSeek models
+        if (resolved === 'smart' || isNil(resolved)) {
+            resolved = 'deepseek-v4-pro';
+        } else if (resolved === 'fast') {
+            resolved = 'deepseek-flash';
+        } else if (resolved === 'expert') {
+            resolved = 'deepseek-reasoner';
+        }
+        
+        if (!isNil(modelIds) && modelIds.length > 0 && resolved && modelIds.includes(resolved)) {
+            return resolved;
+        }
+        if (resolved && resolved !== 'smart' && resolved !== 'fast' && resolved !== 'expert') {
+            return resolved;
+        }
+        return modelIds && modelIds.length > 0 ? modelIds[0] : 'deepseek-v4-pro';
     }
     const preferred = selectedModel && candidates.includes(selectedModel) ? selectedModel : nativeModelIdFor({ tier })
     return pickAllowedModel({ provider, selectedModel: preferred, candidates, modelScope, modelIds })
