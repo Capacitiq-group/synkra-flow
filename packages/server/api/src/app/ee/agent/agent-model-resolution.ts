@@ -48,6 +48,12 @@ function pickAllowedModel({ provider, selectedModel, candidates, modelScope, mod
     if (allowed.length === 0 && !isNil(modelIds) && modelIds.length > 0) {
         allowed = modelIds
     }
+    // [SYNKRA] Analytics/billing calls resolve the model ID after the fact
+    // and don't pass modelIds. If we have a selectedModel that already ran,
+    // trust it rather than crashing the billing hook.
+    if (allowed.length === 0 && !isNil(selectedModel)) {
+        allowed = [selectedModel]
+    }
     if (allowed.length === 0) {
         throw new ActivepiecesError({
             code: ErrorCode.ENTITY_NOT_FOUND,
