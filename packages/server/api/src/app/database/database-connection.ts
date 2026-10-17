@@ -5,6 +5,7 @@ import {
 } from 'typeorm'
 import { AIProviderEntity } from '../ai/ai-provider-entity'
 import { SynkraCustomDomainEntity } from '../synkra/custom-domain/custom-domain.entity'
+import { SynkraKbDocumentEntity } from '../synkra/knowledge-base/kb-document.entity'
 import { AiToolConfigEntity } from '../ai/ai-tool-config-entity'
 import { PlatformModelTierEntity } from '../ai/platform-model-tier-entity'
 import { PlatformAnalyticsReportEntity } from '../analytics/platform-analytics-report.entity'
@@ -112,6 +113,7 @@ function getEntities(): EntitySchema<unknown>[] {
         SynkraBetaApplicationEntity,
         AIProviderEntity,
         SynkraCustomDomainEntity,
+        SynkraKbDocumentEntity,
         AiToolConfigEntity,
         PlatformModelTierEntity,
         ProjectRoleEntity,

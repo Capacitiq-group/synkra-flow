@@ -1,3 +1,4 @@
+import { synkraKbController } from '../knowledge-base/kb.controller';
 import { synkraCustomDomainController } from '../custom-domain/custom-domain.controller';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { paystackWebhookController } from './paystack-webhook.controller';
@@ -100,4 +101,5 @@ export const synkraBillingModule: FastifyPluginAsyncZod = async (app) => {
   await app.register(synkraAgencyInvoiceController, { prefix: '/v1/synkra/agency' });
   await app.register(synkraAgencyOnboardingController, { prefix: '/v1/synkra/agency' });
   await app.register(synkraCustomDomainController, { prefix: '/v1/synkra/custom-domain' });
+  await app.register(synkraKbController, { prefix: '/v1/synkra/knowledge-base' });
 };
