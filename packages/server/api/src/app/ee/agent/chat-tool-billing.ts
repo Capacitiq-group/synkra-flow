@@ -8,6 +8,8 @@ import { platformPlanService } from '../platform/platform-plan/platform-plan.ser
 import { agentHelpers } from './agent-helpers'
 import { agentModelTier } from './agent-model-tier'
 import { agentHistory } from './history/agent-history'
+import { platformService } from '../../platform/platform.service'
+import { synkraUsageService } from '../../synkra/billing/usage.service'
 
 function latestTurnToolCalls({ messages }: { messages: PersistedAgentMessage[] }): ChatToolCall[] {
     const lastUserIndex = messages.map((message) => message.role).lastIndexOf(PersistedAgentRole.USER)
@@ -39,6 +41,20 @@ async function chargeForLatestTurn({ conversation, runId, answeredBy, log }: Cha
     const platformPlan = await platformPlanService(log).getOrCreateForPlatform(conversation.platformId)
 
     const { messageCredits, billedToolCalls, total } = chatBilling.creditsForTurn({ provider, toolCalls: latestTurnToolCalls({ messages }) })
+    
+    // [SYNKRA] Direct usage increment to guarantee credits are tracked
+    if (total > 0) {
+        try {
+            const platform = await platformService(log).getOne(conversation.platformId as never)
+            if (platform?.ownerId) {
+                await synkraUsageService(log).increment(platform.ownerId, 'aiOpsUsed', total)
+                log.info({ platformId: conversation.platformId, total }, '[SYNKRA] Chat credits manually charged')
+            }
+        } catch (err) {
+            log.warn({ err }, '[SYNKRA] Failed to manually charge chat credits')
+        }
+    }
+
     const charge = total === 0 ? undefined : {
         platformId: conversation.platformId,
         value: total,
