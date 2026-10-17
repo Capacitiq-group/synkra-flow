@@ -115,6 +115,12 @@ function resolveModelIdForProvider({ provider, selectedModel, surface, config, m
         return tier.modelId
     }
     const candidates = aiProviderUtils.runnableChatModelIds({ provider })
+    // [SYNKRA] AP's registry doesn't include custom providers like DeepSeek.
+    // If candidates is empty, trust the selectedModel directly instead of
+    // falling through to a null preferred model and throwing in pickAllowedModel.
+    if (candidates.length === 0 && !isNil(selectedModel)) {
+        return selectedModel;
+    }
     const preferred = selectedModel && candidates.includes(selectedModel) ? selectedModel : nativeModelIdFor({ tier })
     return pickAllowedModel({ provider, selectedModel: preferred, candidates, modelScope, modelIds })
 }

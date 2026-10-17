@@ -5,6 +5,7 @@ import { FastifyBaseLogger } from 'fastify';
 import { pieceInstallService } from '../../pieces/piece-install-service';
 import { pieceMetadataService } from '../../pieces/metadata/piece-metadata-service';
 import { platformRepo } from '../../platform/platform.service';
+import { pieceSetRepo } from '../../ee/pieces/piece-set/piece-set.service';
 
 /**
  * Synkra Flow bundled pieces boot seed.
@@ -134,6 +135,25 @@ export const synkraBundledPiecesService = (log: FastifyBaseLogger) => ({
   },
 });
 
+async function ensurePieceSetIncludes(platformId: string, pieceName: string, log: FastifyBaseLogger) {
+  try {
+    const pieceSet = await pieceSetRepo().findOneBy({ platformId, isDefault: true });
+    if (!pieceSet) return;
+    const config = pieceSet.config;
+    if (config.pieces.mode === 'include_all') return;
+    const exceptions = config.pieces.exceptions || [];
+    if (exceptions.includes(pieceName)) return;
+    
+    exceptions.push(pieceName);
+    config.pieces.exceptions = exceptions;
+    
+    await pieceSetRepo().update({ id: pieceSet.id }, { config });
+    log.info({ piece: pieceName, pieceSetId: pieceSet.id }, 'synkra bundled piece added to default piece set');
+  } catch (err) {
+    log.warn({ err, piece: pieceName }, 'failed to add piece to default piece set');
+  }
+}
+
 async function installOne(
   platformId: string,
   spec: BundledPieceSpec,
@@ -151,6 +171,7 @@ async function installOne(
         { piece: spec.name, version: spec.version, platformId },
         'synkra bundled piece already installed',
       );
+      await ensurePieceSetIncludes(platformId, spec.name, log);
       return;
     }
   } catch {
@@ -181,6 +202,7 @@ async function installOne(
       { piece: spec.name, version: spec.version, platformId },
       'synkra bundled piece installed',
     );
+    await ensurePieceSetIncludes(platformId, spec.name, log);
   } catch (e) {
     log.error(
       { err: e, piece: spec.name, version: spec.version, platformId },
