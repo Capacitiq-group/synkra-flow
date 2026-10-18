@@ -28,6 +28,7 @@ import {
   LayoutDashboard,
   Plug,
   Workflow,
+  Table2,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ComponentType, useState } from 'react';
@@ -136,6 +137,13 @@ export function PrimaryRail() {
               icon={Workflow}
               label={t('Automations')}
               isActive={({ pathname }) => pathname.startsWith('/automations')}
+            />
+            <RailNavButton
+              collapsed={collapsed}
+              to="/tables"
+              icon={Table2}
+              label={t('Tables')}
+              isActive={({ pathname }) => pathname.startsWith('/tables')}
             />
             <RailNavButton
               collapsed={collapsed}
