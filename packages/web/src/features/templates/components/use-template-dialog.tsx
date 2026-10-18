@@ -50,6 +50,17 @@ export const UseTemplateDialog = ({
   const navigate = useNavigate();
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [selectedFolderId, setSelectedFolderId] = useState<string>('');
+  // [SYNKRA] State for swappable platform slots
+  const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const slots = (template.metadata as any)?.slots || {};
+    const initialSelections: Record<string, string> = {};
+    Object.keys(slots).forEach(key => {
+      initialSelections[key] = slots[key].default;
+    });
+    setSelectedSlots(initialSelections);
+  }, [template]);
 
   const { data: projects } = projectCollectionUtils.useAll();
   const { folders } = foldersHooks.useFolders();
@@ -88,8 +99,36 @@ export const UseTemplateDialog = ({
         folderName = folder.displayName;
       }
 
+      // [SYNKRA] Deep clone template to rewrite pieces based on selected slots
+      const modifiedTemplate = JSON.parse(JSON.stringify(template));
+      const slots = (modifiedTemplate.metadata as any)?.slots || {};
+      
+      if (Object.keys(slots).length > 0 && modifiedTemplate.flows) {
+        modifiedTemplate.flows.forEach((flow: any) => {
+          const version = flow.version;
+          if (!version) return;
+          
+          // Helper to swap piece names
+          const swapPiece = (step: any) => {
+            if (!step || !step.settings) return;
+            Object.keys(slots).forEach(slotKey => {
+              const slotConfig = slots[slotKey];
+              const selectedPiece = selectedSlots[slotKey];
+              // If the current piece is the default one, swap it with the user's choice
+              if (step.settings.pieceName === slotConfig.default && selectedPiece) {
+                step.settings.pieceName = selectedPiece;
+                step.displayName = step.displayName.replace('Gmail', selectedPiece.split('/').pop()); // Optional: clean up display name
+              }
+            });
+          };
+
+          swapPiece(version.trigger);
+          version.actions?.forEach(swapPiece);
+        });
+      }
+
       return await flowHooks.importFlowsFromTemplates({
-        templates: [template],
+        templates: [modifiedTemplate],
         projectId,
         folderName,
       });
@@ -198,6 +237,31 @@ export const UseTemplateDialog = ({
             </div>
           )}
         </div>
+        {/* [SYNKRA] Render Slot Swapper UI */}
+        {Object.keys((template.metadata as any)?.slots || {}).map((slotKey) => {
+          const slotConfig = (template.metadata as any).slots[slotKey];
+          return (
+            <div className="flex flex-col gap-2" key={slotKey}>
+              <Label htmlFor={slotKey} className="capitalize">{t('Select ' + slotKey.replace('_', ' '))}</Label>
+              <Select
+                value={selectedSlots[slotKey]}
+                onValueChange={(val) => setSelectedSlots(prev => ({ ...prev, [slotKey]: val }))}
+              >
+                <SelectTrigger id={slotKey}>
+                  <SelectValue placeholder={t('Select a platform')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {slotConfig.options.map((piece: string) => (
+                    <SelectItem key={piece} value={piece}>
+                      {piece.split('/').pop()?.replace('piece-', '').toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        })}
+
         <DialogFooter>
           <Button
             variant="outline"

@@ -437,7 +437,9 @@ function RailNavButton({
 }
 
 function RailPinnedProjects({ collapsed }: { collapsed: boolean }) {
-  const { data: projects } = projectCollectionUtils.useAll();
+  const { data: rawProjects } = projectCollectionUtils.useAll();
+  // [SYNKRA] Hide the default 'Personal Project' from the sidebar
+  const projects = rawProjects?.filter(p => p.type !== ProjectType.PERSONAL) || [];
   const { platform } = platformHooks.useCurrentPlatform();
   const { data: currentUser } = userHooks.useCurrentUser();
   const location = useLocation();
