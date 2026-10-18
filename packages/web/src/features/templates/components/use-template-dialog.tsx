@@ -251,11 +251,22 @@ export const UseTemplateDialog = ({
                   <SelectValue placeholder={t('Select a platform')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {slotConfig.options.map((piece: string) => (
-                    <SelectItem key={piece} value={piece}>
-                      {piece.split('/').pop()?.replace('piece-', '').toUpperCase()}
-                    </SelectItem>
-                  ))}
+                  {slotConfig.options.map((piece: string) => {
+                    const pieceName = piece.split('/').pop()?.replace('piece-', '');
+                    return (
+                      <SelectItem key={piece} value={piece}>
+                        <div className="flex items-center gap-2">
+                          <img 
+                            src={`https://cdn.activepieces.com/pieces/${pieceName}.png`} 
+                            alt={pieceName} 
+                            className="w-5 h-5 object-contain"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                          <span className="capitalize">{pieceName?.replace(/-/g, ' ')}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
