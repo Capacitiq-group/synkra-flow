@@ -232,15 +232,33 @@ const TemplateDetailsPage = ({ template }: TemplateDetailsPageProps) => {
                   </div>
                 )}
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-4">
                   <span className="text-sm font-medium">
-                    {t('Used Pieces')}
+                    {t('Compatible Platforms')}
                   </span>
-                  <div className="flex flex-wrap gap-2">
-                    {template.pieces.map((pieceName: string, index: number) => (
-                      <PieceCard key={index} pieceName={pieceName} />
-                    ))}
-                  </div>
+                  
+                  {/* If the template has slots (e.g. Email, CRM), show them grouped */}
+                  {(template.metadata as any)?.slots ? (
+                    Object.entries((template.metadata as any).slots).map(([slotKey, slotData]: [string, any]) => (
+                      <div key={slotKey} className="flex flex-col gap-2">
+                        <span className="text-xs font-semibold uppercase text-gray-500">
+                          {slotKey.replace('_', ' ')}
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {slotData.options.map((pieceName: string) => (
+                            <PieceCard key={pieceName} pieceName={pieceName} />
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    /* Fallback for templates without slots */
+                    <div className="flex flex-wrap gap-2">
+                      {template.pieces.map((pieceName: string, index: number) => (
+                        <PieceCard key={index} pieceName={pieceName} />
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-1 text-xs">
