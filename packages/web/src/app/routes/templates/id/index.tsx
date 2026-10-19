@@ -132,7 +132,7 @@ const TemplateDetailsPage = ({ template }: TemplateDetailsPageProps) => {
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden absolute inset-0">
-      {template.type !== TemplateType.SHARED && (
+      {false && (
         <div className="border-b py-4 px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <Button
@@ -184,7 +184,7 @@ const TemplateDetailsPage = ({ template }: TemplateDetailsPageProps) => {
                     {t('Use Template')}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                  {template.type !== TemplateType.SHARED && (
+                  {false && (
                     <Button
                       variant="outline"
                       onClick={handleUseWithGuide}

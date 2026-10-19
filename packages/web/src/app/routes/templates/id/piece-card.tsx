@@ -1,6 +1,16 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { PieceIconWithPieceName, piecesHooks } from '@/features/pieces';
-import { formatUtils } from '@/lib/format-utils';
+
+
+const getCleanPieceName = (name: string) => {
+  if (!name) return '';
+  return name
+    .split('/')
+    .pop()
+    ?.replace('piece-', '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase()) || name;
+};
 
 type PieceCardProps = {
   pieceName: string;
@@ -15,7 +25,7 @@ export const PieceCard = ({ pieceName }: PieceCardProps) => {
         <PieceIconWithPieceName pieceName={pieceName} size="md" />
         <span className="text-sm font-medium">
           {summary?.displayName ||
-            formatUtils.convertEnumToHumanReadable(pieceName)}
+            getCleanPieceName(pieceName)}
         </span>
       </CardContent>
     </Card>
